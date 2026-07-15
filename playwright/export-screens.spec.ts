@@ -1,5 +1,5 @@
 import { test, expect } from "@playwright/test";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readdir, unlink } from "node:fs/promises";
 import path from "node:path";
 
 const EXPORT_DIR = path.resolve(process.cwd(), "exports");
@@ -13,6 +13,12 @@ function safeFilename(value: string) {
 
 test("export every HMI screen state as a 1024x768 PNG", async ({ page }) => {
   await mkdir(EXPORT_DIR, { recursive: true });
+  const previousFiles = await readdir(EXPORT_DIR);
+  await Promise.all(
+    previousFiles
+      .filter((filename) => filename.toLowerCase().endsWith(".png"))
+      .map((filename) => unlink(path.join(EXPORT_DIR, filename))),
+  );
   await page.goto("/", { waitUntil: "networkidle" });
 
   await page.locator('[data-section-id="07"]').click();
@@ -23,13 +29,15 @@ test("export every HMI screen state as a 1024x768 PNG", async ({ page }) => {
 
   const frameButtons = page.locator("[data-frame-id]");
   const frames = await frameButtons.evaluateAll((buttons) =>
-    buttons.map((button) => ({
-      id: button.getAttribute("data-frame-id") ?? "screen",
-      name: button.getAttribute("data-frame-name") ?? "state",
-    })),
+    buttons
+      .map((button) => ({
+        id: button.getAttribute("data-frame-id") ?? "screen",
+        name: button.getAttribute("data-frame-name") ?? "state",
+      }))
+      .filter((frame) => frame.id !== "LIVE"),
   );
 
-  for (const frame of frames) {
+  for (const [index, frame] of frames.entries()) {
     await page.locator(`[data-frame-id="${frame.id}"]`).click();
 
     const screenFrame = page.locator('[data-screen-frame="true"]');
@@ -43,7 +51,8 @@ test("export every HMI screen state as a 1024x768 PNG", async ({ page }) => {
       );
     });
 
-    const filename = `${safeFilename(frame.id)}_${safeFilename(frame.name)}.png`;
+    const sequence = String(index + 1).padStart(3, "0");
+    const filename = `${sequence}_${safeFilename(frame.id)}_${safeFilename(frame.name)}.png`;
     await screenFrame.screenshot({
       path: path.join(EXPORT_DIR, filename),
       type: "png",
