@@ -475,6 +475,11 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
         buildFrame("FRX-023","Parameter Degree",  "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="degree" />),
         buildFrame("FRX-024","Parameter Density", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="density" />),
         buildFrame("FRX-025","Parameter Pause",   "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="pause" />),
+        buildFrame("FRX-026","Size Lock Active",   "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeLocked />),
+        buildFrame("FRX-027","Width Plus Active",  "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxWidth-inc" />),
+        buildFrame("FRX-028","Width Minus Active", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxWidth-dec" />),
+        buildFrame("FRX-029","Length Plus Active", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxLength-inc" />),
+        buildFrame("FRX-030","Length Minus Active","frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxLength-dec" />),
       ],
     },
   ];
@@ -581,7 +586,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
 
         {/* canvas area — scrollable if viewport too small */}
         <div style={{ flex:1, overflow:"auto", display:"flex", alignItems:"flex-start", justifyContent:"flex-start", padding:24, background:"#04090f" }}>
-          <div ref={previewMountRef}>
+          <div key={selected.id} ref={previewMountRef}>
             {selected.render()}
           </div>
         </div>

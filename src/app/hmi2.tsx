@@ -189,9 +189,11 @@ function HParamCol({
           padding: emphasized ? "14px 0" : "8px 0",
           boxSizing: "border-box",
           borderRadius: "10px 10px 0 0",
-          border: `1px solid ${pressedControl === "inc" ? "rgba(30,126,245,0.7)" : "rgba(255,255,255,0.08)"}`,
+          border: "1px solid rgba(255,255,255,0.08)",
           borderBottom: "1px solid rgba(255,255,255,0.06)",
-          background: pressedControl === "inc" ? "rgba(30,126,245,0.18)" : "rgba(255,255,255,0.06)",
+          background: pressedControl === "inc"
+            ? "rgba(255,255,255,0.035)"
+            : "linear-gradient(180deg, rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.045) 100%)",
           color: locked ? "#1e3050" : "#8ab0d8",
           fontSize: emphasized ? 36 : 26,
           fontWeight: 600,
@@ -201,7 +203,9 @@ function HParamCol({
           alignItems: "center",
           justifyContent: "center",
           transform: pressedControl === "inc" ? "translateY(1px)" : "none",
-          boxShadow: pressedControl === "inc" ? "inset 0 2px 8px rgba(0,0,0,0.28)" : "inset 0 -1px 0 rgba(255,255,255,0.04)",
+          boxShadow: pressedControl === "inc"
+            ? "inset 0 2px 6px rgba(0,0,0,0.38)"
+            : "inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 4px rgba(0,0,0,0.2)",
           transition: "all 0.1s",
         }}
       >
@@ -260,9 +264,11 @@ function HParamCol({
           padding: emphasized ? "14px 0" : "8px 0",
           boxSizing: "border-box",
           borderRadius: "0 0 10px 10px",
-          border: `1px solid ${pressedControl === "dec" ? "rgba(30,126,245,0.7)" : "rgba(255,255,255,0.08)"}`,
+          border: "1px solid rgba(255,255,255,0.08)",
           borderTop: "1px solid rgba(255,255,255,0.06)",
-          background: pressedControl === "dec" ? "rgba(30,126,245,0.18)" : "rgba(255,255,255,0.06)",
+          background: pressedControl === "dec"
+            ? "rgba(255,255,255,0.035)"
+            : "linear-gradient(180deg, rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.045) 100%)",
           color: locked ? "#1e3050" : "#8ab0d8",
           fontSize: emphasized ? 36 : 26,
           fontWeight: 600,
@@ -272,7 +278,9 @@ function HParamCol({
           alignItems: "center",
           justifyContent: "center",
           transform: pressedControl === "dec" ? "translateY(1px)" : "none",
-          boxShadow: pressedControl === "dec" ? "inset 0 2px 8px rgba(0,0,0,0.28)" : "inset 0 1px 0 rgba(255,255,255,0.04)",
+          boxShadow: pressedControl === "dec"
+            ? "inset 0 2px 6px rgba(0,0,0,0.38)"
+            : "inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 4px rgba(0,0,0,0.2)",
           transition: "all 0.1s",
         }}
       >
@@ -1909,14 +1917,19 @@ export function HMI2FRX({
   upd,
   onMenu,
   forcedParam,
+  forcedSizeLocked,
+  forcedSizeControl,
 }: {
   s: HMIState2;
   upd: (p: Partial<HMIState2>) => void;
   onMenu: (k: "memo" | "call" | "save") => void;
   forcedParam?: "power" | "degree" | "density" | "pause";
+  forcedSizeLocked?: boolean;
+  forcedSizeControl?: "frxWidth-inc" | "frxWidth-dec" | "frxLength-inc" | "frxLength-dec";
 }) {
   const locked = s.laserState === "lasering";
-  const [sizeLocked, setSizeLocked] = useState(false);
+  const [sizeLocked, setSizeLocked] = useState(forcedSizeLocked ?? false);
+  const [pressedSizeControl, setPressedSizeControl] = useState<string | null>(forcedSizeControl ?? null);
   const [activeParam, setActiveParam] = useState<
     "power" | "degree" | "density" | "pause"
   >("power");
@@ -2208,9 +2221,10 @@ export function HMI2FRX({
           <div
             style={{
               width: "100%",
-              display: "flex",
+              display: "grid",
+              gridTemplateColumns: "minmax(0, 1fr) 44px minmax(0, 1fr)",
               alignItems: "center",
-              gap: 20,
+              gap: 10,
             }}
           >
           {(
@@ -2218,11 +2232,10 @@ export function HMI2FRX({
               ["frxWidth", "WIDTH", "mm", 5, 40, 1],
               ["frxLength", "LENGTH", "mm", 5, 40, 1],
             ] as const
-          ).map(([key, lbl, unit, mn, mx, st]) => (
+          ).map(([key, lbl, unit, mn, mx, st], index) => (
+            <React.Fragment key={key}>
             <div
-              key={key}
               style={{
-                flex: 1,
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -2256,6 +2269,12 @@ export function HMI2FRX({
               >
                 <button
                   disabled={sizeLocked || locked}
+                  onPointerDown={() =>
+                    !sizeLocked && !locked && setPressedSizeControl(`${key}-inc`)
+                  }
+                  onPointerUp={() => setPressedSizeControl(null)}
+                  onPointerLeave={() => setPressedSizeControl(null)}
+                  onPointerCancel={() => setPressedSizeControl(null)}
                   onClick={() =>
                     upd({
                       [key]: adjVal(
@@ -2271,12 +2290,16 @@ export function HMI2FRX({
                     width: "100%",
                     height: 50,
                     borderRadius: "10px 10px 0 0",
-                    border: "none",
+                    border: "1px solid transparent",
                     borderBottom: `1px solid ${H.border}`,
-                    background: sizeLocked || locked
+                    background: pressedSizeControl === `${key}-inc`
                       ? "rgba(255,255,255,0.02)"
-                      : "rgba(255,255,255,0.04)",
-                    color: sizeLocked || locked ? H.textDim : "#7a9bbf",
+                      : sizeLocked || locked
+                      ? "rgba(255,255,255,0.02)"
+                      : "linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.035) 100%)",
+                    color: pressedSizeControl === `${key}-inc`
+                      ? "#7a9bbf"
+                      : sizeLocked || locked ? H.textDim : "#7a9bbf",
                     fontSize: 24,
                     fontWeight: 700,
                     lineHeight: 1,
@@ -2285,6 +2308,13 @@ export function HMI2FRX({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    transform: pressedSizeControl === `${key}-inc` ? "translateY(1px)" : "none",
+                    boxShadow: pressedSizeControl === `${key}-inc`
+                      ? "inset 0 2px 6px rgba(0,0,0,0.38)"
+                      : sizeLocked || locked
+                      ? "none"
+                      : "inset 0 1px 0 rgba(255,255,255,0.07), 0 2px 4px rgba(0,0,0,0.2)",
+                    transition: "all 0.1s",
                   }}
                 >
                   +
@@ -2326,6 +2356,12 @@ export function HMI2FRX({
                 </div>
                 <button
                   disabled={sizeLocked || locked}
+                  onPointerDown={() =>
+                    !sizeLocked && !locked && setPressedSizeControl(`${key}-dec`)
+                  }
+                  onPointerUp={() => setPressedSizeControl(null)}
+                  onPointerLeave={() => setPressedSizeControl(null)}
+                  onPointerCancel={() => setPressedSizeControl(null)}
                   onClick={() =>
                     upd({
                       [key]: adjVal(
@@ -2341,12 +2377,16 @@ export function HMI2FRX({
                     width: "100%",
                     height: 46,
                     borderRadius: "0 0 10px 10px",
-                    border: "none",
+                    border: "1px solid transparent",
                     borderTop: `1px solid ${H.border}`,
-                    background: sizeLocked || locked
+                    background: pressedSizeControl === `${key}-dec`
                       ? "rgba(255,255,255,0.02)"
-                      : "rgba(255,255,255,0.04)",
-                    color: sizeLocked || locked ? H.textDim : "#7a9bbf",
+                      : sizeLocked || locked
+                      ? "rgba(255,255,255,0.02)"
+                      : "linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.035) 100%)",
+                    color: pressedSizeControl === `${key}-dec`
+                      ? "#7a9bbf"
+                      : sizeLocked || locked ? H.textDim : "#7a9bbf",
                     fontSize: 24,
                     fontWeight: 700,
                     lineHeight: 1,
@@ -2355,49 +2395,59 @@ export function HMI2FRX({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    transform: pressedSizeControl === `${key}-dec` ? "translateY(1px)" : "none",
+                    boxShadow: pressedSizeControl === `${key}-dec`
+                      ? "inset 0 2px 6px rgba(0,0,0,0.38)"
+                      : sizeLocked || locked
+                      ? "none"
+                      : "inset 0 1px 0 rgba(255,255,255,0.07), 0 2px 4px rgba(0,0,0,0.2)",
+                    transition: "all 0.1s",
                   }}
                 >
                   −
                 </button>
               </div>
             </div>
+            {index === 0 && (
+              <button
+                onClick={() => setSizeLocked((value) => !value)}
+                aria-label={sizeLocked ? "Unlock width and length" : "Lock width and length"}
+                aria-pressed={sizeLocked}
+                title={sizeLocked ? "Unlock width and length" : "Lock width and length"}
+                style={{
+                  width: 44,
+                  height: 44,
+                  borderRadius: 10,
+                  border: `1px solid ${sizeLocked ? H.blue : H.border}`,
+                  background: sizeLocked ? H.blueDim : "rgba(255,255,255,0.03)",
+                  color: sizeLocked ? H.blue : H.textSub,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: 0,
+                  transition: "all 0.14s",
+                }}
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <rect x="4" y="10" width="16" height="11" rx="2" />
+                  <path d={sizeLocked ? "M8 10V7a4 4 0 0 1 8 0v3" : "M8 10V7a4 4 0 0 1 7.4-2.1"} />
+                </svg>
+              </button>
+            )}
+            </React.Fragment>
           ))}
           </div>
-          <button
-            onClick={() => setSizeLocked((value) => !value)}
-            aria-pressed={sizeLocked}
-            style={{
-              width: 129,
-              height: 38,
-              borderRadius: 9,
-              border: `1px solid ${sizeLocked ? H.blue : H.border}`,
-              background: sizeLocked ? H.blueDim : "rgba(255,255,255,0.03)",
-              color: sizeLocked ? H.blue : H.textSub,
-              fontSize: 14,
-              fontWeight: 700,
-              letterSpacing: "0.08em",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 9,
-              alignSelf: "flex-end",
-              marginTop: 11,
-              marginRight: 36,
-              transition: "all 0.14s",
-            }}
-          >
-            <span>LOCK</span>
-            <span
-              style={{
-                minWidth: 32,
-                color: sizeLocked ? H.blue : H.textDim,
-                fontFamily: "'JetBrains Mono',monospace",
-              }}
-            >
-              {sizeLocked ? "ON" : "OFF"}
-            </span>
-          </button>
         </div>
       </div>
       {/* RIGHT: parameters */}
