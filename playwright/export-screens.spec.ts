@@ -3,6 +3,7 @@ import { mkdir, readdir, unlink } from "node:fs/promises";
 import path from "node:path";
 
 const EXPORT_DIR = path.resolve(process.cwd(), "exports");
+const TARGET_FRAME_ID = process.env.EXPORT_FRAME_ID?.trim();
 
 function safeFilename(value: string) {
   return value
@@ -37,7 +38,13 @@ test("export every HMI screen state as a 1024x768 PNG", async ({ page }) => {
       .filter((frame) => frame.id !== "LIVE"),
   );
 
-  for (const [index, frame] of frames.entries()) {
+  const targetFrames = TARGET_FRAME_ID
+    ? frames.filter((frame) => frame.id === TARGET_FRAME_ID)
+    : frames;
+
+  expect(targetFrames.length, `Unknown frame id: ${TARGET_FRAME_ID}`).toBeGreaterThan(0);
+
+  for (const [index, frame] of targetFrames.entries()) {
     await page.locator(`[data-frame-id="${frame.id}"]`).click();
 
     const screenFrame = page.locator('[data-screen-frame="true"]');

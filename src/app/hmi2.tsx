@@ -430,6 +430,7 @@ export function HTopBar({
   soundOn,
   aimingLevel,
   onMenu,
+  activeMenu = null,
   cameraActive = false,
   onCamera,
   onSound,
@@ -440,6 +441,7 @@ export function HTopBar({
   soundOn: boolean;
   aimingLevel: 0 | 1 | 2 | 3 | 4 | 5;
   onMenu?: (k: "memo" | "call" | "save") => void;
+  activeMenu?: "memo" | "call" | "save" | null;
   cameraActive?: boolean;
   onCamera?: () => void;
   onSound: () => void;
@@ -569,9 +571,9 @@ export function HTopBar({
             height: LAYOUT.topBtnHeight,
             padding: `0 ${LAYOUT.topBtnPadX}px`,
             borderRadius: LAYOUT.topBtnRadius,
-            border: `1px solid ${H.border}`,
-            background: "rgba(255,255,255,0.03)",
-            color: H.textSub,
+            border: `1px solid ${activeMenu === item ? "rgba(0,202,228,0.45)" : H.border}`,
+            background: activeMenu === item ? "rgba(0,202,228,0.08)" : "rgba(255,255,255,0.03)",
+            color: activeMenu === item ? H.cyan : H.textSub,
             fontSize: 14,
             fontWeight: 700,
             letterSpacing: "0.08em",
@@ -920,7 +922,13 @@ function HQTechLogo({ width = 260 }: { width?: number }) {
 // │  States  : 1 (단일 BMP — 애니메이션 없음, 로딩 바는 DGUS VP로 구현)              │
 // │  Export  : Screen_00_Splash.bmp                                              │
 // └─────────────────────────────────────────────────────────────────────────────┘
-export function HMI2Splash({ onDone }: { onDone: () => void }) {
+export function HMI2Splash({
+  onDone,
+  forcedProgress,
+}: {
+  onDone: () => void;
+  forcedProgress?: 0 | 50 | 100;
+}) {
   useEffect(() => {
     const t = setTimeout(onDone, 3000);
     return () => clearTimeout(t);
@@ -988,15 +996,7 @@ export function HMI2Splash({ onDone }: { onDone: () => void }) {
           >
             CO₂ Laser System
           </div>
-          <div
-            style={{
-              fontSize: 14,
-              color: H.textDim,
-              letterSpacing: "0.08em",
-            }}
-          >
-            v3.3.0 &nbsp;·&nbsp; SN: LMX-2026-0847
-          </div>
+
         </motion.div>
         {/* Loading bar */}
         <motion.div
@@ -1020,9 +1020,9 @@ export function HMI2Splash({ onDone }: { onDone: () => void }) {
             }}
           >
             <motion.div
-              initial={{ width: "0%" }}
-              animate={{ width: "100%" }}
-              transition={{ duration: 2.6, ease: "easeInOut" }}
+              initial={{ width: forcedProgress === undefined ? "0%" : `${forcedProgress}%` }}
+              animate={{ width: forcedProgress === undefined ? "100%" : `${forcedProgress}%` }}
+              transition={forcedProgress === undefined ? { duration: 2.6, ease: "easeInOut" } : { duration: 0 }}
               style={{
                 height: "100%",
                 borderRadius: 999,
@@ -1057,9 +1057,11 @@ export function HMI2Splash({ onDone }: { onDone: () => void }) {
 export function HMI2Home({
   onCOS,
   onFRX,
+  forcedActive = null,
 }: {
   onCOS: () => void;
   onFRX: () => void;
+  forcedActive?: "cos" | "frx" | null;
 }) {
   const [hov, setHov] = useState<string | null>(null);
   const [pressed, setPressed] = useState<string | null>(null);
@@ -1221,7 +1223,7 @@ export function HMI2Home({
             icon,
           }) => {
             const isHov = hov === id;
-            const isPressed = pressed === id;
+            const isPressed = forcedActive === id || pressed === id;
             return (
               <div
                 key={id}
@@ -1543,10 +1545,12 @@ export function HMI2COS({
   s,
   upd,
   onMenu,
+  forcedParam,
 }: {
   s: HMIState2;
   upd: (p: Partial<HMIState2>) => void;
   onMenu: (k: "memo" | "call" | "save") => void;
+  forcedParam?: "power" | "duration" | "interval";
 }) {
   const locked = s.laserState === "lasering";
   const [activeCosParam, setActiveCosParam] = useState<
@@ -1575,7 +1579,8 @@ export function HMI2COS({
       onInc: () => upd({ co2Interval: adjVal(s.co2Interval, 1, 1, 100, 1) }),
     },
   };
-  const selectedCosParam = cosParams[activeCosParam];
+  const selectedCosParamKey = forcedParam ?? activeCosParam;
+  const selectedCosParam = cosParams[selectedCosParamKey];
 
   const laserModeIcons: {
     CW: React.ReactNode;
@@ -1813,7 +1818,7 @@ export function HMI2COS({
             }}
           >
             {(Object.keys(cosParams) as Array<keyof typeof cosParams>).map((key) => {
-              const active = activeCosParam === key;
+              const active = selectedCosParamKey === key;
               return (
                 <button
                   key={key}
@@ -1883,10 +1888,12 @@ export function HMI2FRX({
   s,
   upd,
   onMenu,
+  forcedParam,
 }: {
   s: HMIState2;
   upd: (p: Partial<HMIState2>) => void;
   onMenu: (k: "memo" | "call" | "save") => void;
+  forcedParam?: "power" | "degree" | "density" | "pause";
 }) {
   const locked = s.laserState === "lasering";
   const [sizeLocked, setSizeLocked] = useState(false);
@@ -1923,7 +1930,8 @@ export function HMI2FRX({
       onInc: () => upd({ frxPauseTime: adjVal(s.frxPauseTime, 0.1, 0.1, 5, 0.1) }),
     },
   };
-  const selectedParam = frxParams[activeParam];
+  const selectedParamKey = forcedParam ?? activeParam;
+  const selectedParam = frxParams[selectedParamKey];
 
   const shapes: [string, React.ReactNode][] = [
     [
@@ -2400,7 +2408,7 @@ export function HMI2FRX({
             }}
           >
             {(Object.keys(frxParams) as Array<keyof typeof frxParams>).map((key) => {
-              const active = activeParam === key;
+              const active = selectedParamKey === key;
               return (
                 <button
                   key={key}
@@ -3185,6 +3193,7 @@ export function HMIRoot2({ onStateChange }: { onStateChange?: (s: HMIState2) => 
           soundOn={s.soundOn}
           aimingLevel={s.aimingLevel}
           onMenu={isTreatment ? setOverlay : undefined}
+          activeMenu={overlay === "memo" || overlay === "call" || overlay === "save" ? overlay : null}
           cameraActive={overlay === "camera"}
           onCamera={() => setOverlay("camera")}
           onSound={() => upd({ soundOn: !s.soundOn })}
