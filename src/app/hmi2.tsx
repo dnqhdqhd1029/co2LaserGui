@@ -83,17 +83,17 @@ export const LAYOUT = {
   canvasH:             768,   // DGUS 화면 세로 (px) ← 600→768
 
   // ── TopBar ────────────────────────────────────────────────────────────────────
-  topbarHeight:        58,    // 상단 바 높이
+  topbarHeight:        62,    // 상단 바 높이
   topbarPadX:          18,    // 상단 바 좌우 패딩
   topbarGap:           12,    // 상단 바 아이템 간격
 
   // ── TopBar 버튼 (Sound / Aiming) ──────────────────────────────────────────────
-  topBtnHeight:        38,    // 버튼 높이
-  topBtnPadX:          14,    // 버튼 좌우 패딩
+  topBtnHeight:        42,    // 버튼 높이
+  topBtnPadX:          16,    // 버튼 좌우 패딩
   topBtnRadius:        9,     // 버튼 모서리
   // ── Section header vertical rhythm ────────────────────────────────────────
-  sectionHeaderPadY:   10,    // 기존 영역에 추가되는 상·하 여백
-  sectionContentGap:   12,    // Header와 콘텐츠 사이 간격
+  sectionHeaderPadY:   12,    // 기존 영역에 추가되는 상·하 여백
+  sectionContentGap:   14,    // Header와 콘텐츠 사이 간격
   sectionAccentGap:    12,    // Accent bar와 제목 사이 간격
   sectionAccentHeight: 22,    // 공통 Accent bar 높이
 
@@ -105,8 +105,8 @@ export const LAYOUT = {
   aimDropRadius:       12,    // 모서리
 
   // ── Left panel (COS / FRX) ────────────────────────────────────────────────────
-  cosPanelWidth:       451,   // COS 좌측 패널 너비 (canvas 44%)
-  frxPanelWidth:       451,   // FRX 좌측 패널 너비 (canvas 44%)
+  cosPanelWidth:       512,   // COS 좌측 패널 너비 (canvas 50%)
+  frxPanelWidth:       512,   // FRX 좌측 패널 너비 (canvas 50%)
   panelPadX:           16,    // 패널 내부 좌우 패딩
   panelPadY:           14,    // 패널 내부 상하 패딩
 
@@ -166,35 +166,43 @@ function HParamCol({
   locked: boolean;
   emphasized?: boolean;
 }) {
+  const [pressedControl, setPressedControl] = useState<"inc" | "dec" | null>(null);
   return (
     <div
       style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        minWidth: emphasized ? 180 : 110,
+        minWidth: emphasized ? 240 : 120,
         gap: 0,
       }}
     >
       <button
         onClick={onInc}
         disabled={locked}
+        onPointerDown={() => !locked && setPressedControl("inc")}
+        onPointerUp={() => setPressedControl(null)}
+        onPointerLeave={() => setPressedControl(null)}
         style={{
           width: "100%",
-          height: emphasized ? 60 : 36,
-          padding: emphasized ? "10px 0" : 0,
+          height: emphasized ? 72 : 44,
+          padding: emphasized ? "14px 0" : "8px 0",
           boxSizing: "border-box",
           borderRadius: "10px 10px 0 0",
-          border: "none",
+          border: `1px solid ${pressedControl === "inc" ? "rgba(30,126,245,0.7)" : "rgba(255,255,255,0.08)"}`,
           borderBottom: "1px solid rgba(255,255,255,0.06)",
-          background: "rgba(255,255,255,0.05)",
+          background: pressedControl === "inc" ? "rgba(30,126,245,0.18)" : "rgba(255,255,255,0.06)",
           color: locked ? "#1e3050" : "#8ab0d8",
-          fontSize: emphasized ? 30 : 22,
+          fontSize: emphasized ? 36 : 26,
+          fontWeight: 600,
+          lineHeight: 1,
           cursor: locked ? "default" : "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          transition: "background 0.1s",
+          transform: pressedControl === "inc" ? "translateY(1px)" : "none",
+          boxShadow: pressedControl === "inc" ? "inset 0 2px 8px rgba(0,0,0,0.28)" : "inset 0 -1px 0 rgba(255,255,255,0.04)",
+          transition: "all 0.1s",
         }}
       >
         +
@@ -202,7 +210,7 @@ function HParamCol({
       <div
         style={{
           width: "100%",
-          padding: emphasized ? "16px 0" : "12px 0",
+          padding: emphasized ? "20px 0" : "14px 0",
           background: "rgba(0,0,0,0.3)",
           display: "flex",
           flexDirection: "column",
@@ -243,22 +251,29 @@ function HParamCol({
       <button
         onClick={onDec}
         disabled={locked}
+        onPointerDown={() => !locked && setPressedControl("dec")}
+        onPointerUp={() => setPressedControl(null)}
+        onPointerLeave={() => setPressedControl(null)}
         style={{
           width: "100%",
-          height: emphasized ? 60 : 36,
-          padding: emphasized ? "10px 0" : 0,
+          height: emphasized ? 72 : 44,
+          padding: emphasized ? "14px 0" : "8px 0",
           boxSizing: "border-box",
           borderRadius: "0 0 10px 10px",
-          border: "none",
+          border: `1px solid ${pressedControl === "dec" ? "rgba(30,126,245,0.7)" : "rgba(255,255,255,0.08)"}`,
           borderTop: "1px solid rgba(255,255,255,0.06)",
-          background: "rgba(255,255,255,0.05)",
+          background: pressedControl === "dec" ? "rgba(30,126,245,0.18)" : "rgba(255,255,255,0.06)",
           color: locked ? "#1e3050" : "#8ab0d8",
-          fontSize: emphasized ? 30 : 22,
+          fontSize: emphasized ? 36 : 26,
+          fontWeight: 600,
+          lineHeight: 1,
           cursor: locked ? "default" : "pointer",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          transition: "background 0.1s",
+          transform: pressedControl === "dec" ? "translateY(1px)" : "none",
+          boxShadow: pressedControl === "dec" ? "inset 0 2px 8px rgba(0,0,0,0.28)" : "inset 0 1px 0 rgba(255,255,255,0.04)",
+          transition: "all 0.1s",
         }}
       >
         −
@@ -384,13 +399,13 @@ export function HLaserBar({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 4,
           transition: "all 0.18s",
         }}
       >
         <span
           style={{
-            fontSize: 17,
+            fontSize: 24,
+            lineHeight: 1.2,
             fontWeight: 800,
             letterSpacing: "0.16em",
             fontFamily: "'Inter',sans-serif",
@@ -409,15 +424,6 @@ export function HLaserBar({
           )}
           {c.label}
         </span>
-        <span
-          style={{
-            fontSize: 14,
-            opacity: 0.6,
-            letterSpacing: "0.05em",
-          }}
-        >
-          {c.sub}
-        </span>
       </button>
     </div>
   );
@@ -430,6 +436,7 @@ export function HTopBar({
   soundOn,
   aimingLevel,
   onMenu,
+  activeMenu = null,
   cameraActive = false,
   onCamera,
   onSound,
@@ -440,6 +447,7 @@ export function HTopBar({
   soundOn: boolean;
   aimingLevel: 0 | 1 | 2 | 3 | 4 | 5;
   onMenu?: (k: "memo" | "call" | "save") => void;
+  activeMenu?: "memo" | "call" | "save" | null;
   cameraActive?: boolean;
   onCamera?: () => void;
   onSound: () => void;
@@ -569,9 +577,9 @@ export function HTopBar({
             height: LAYOUT.topBtnHeight,
             padding: `0 ${LAYOUT.topBtnPadX}px`,
             borderRadius: LAYOUT.topBtnRadius,
-            border: `1px solid ${H.border}`,
-            background: "rgba(255,255,255,0.03)",
-            color: H.textSub,
+            border: `1px solid ${activeMenu === item ? "rgba(0,202,228,0.45)" : H.border}`,
+            background: activeMenu === item ? "rgba(0,202,228,0.08)" : "rgba(255,255,255,0.03)",
+            color: activeMenu === item ? H.cyan : H.textSub,
             fontSize: 14,
             fontWeight: 700,
             letterSpacing: "0.08em",
@@ -920,7 +928,13 @@ function HQTechLogo({ width = 260 }: { width?: number }) {
 // │  States  : 1 (단일 BMP — 애니메이션 없음, 로딩 바는 DGUS VP로 구현)              │
 // │  Export  : Screen_00_Splash.bmp                                              │
 // └─────────────────────────────────────────────────────────────────────────────┘
-export function HMI2Splash({ onDone }: { onDone: () => void }) {
+export function HMI2Splash({
+  onDone,
+  forcedProgress,
+}: {
+  onDone: () => void;
+  forcedProgress?: 0 | 50 | 100;
+}) {
   useEffect(() => {
     const t = setTimeout(onDone, 3000);
     return () => clearTimeout(t);
@@ -958,7 +972,7 @@ export function HMI2Splash({ onDone }: { onDone: () => void }) {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 40,
+          gap: 12,
         }}
       >
         {/* Logo */}
@@ -967,7 +981,7 @@ export function HMI2Splash({ onDone }: { onDone: () => void }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, ease: "easeOut" }}
         >
-          <HQTechLogo width={290} />
+          <HQTechLogo width={360} />
         </motion.div>
         {/* Product info */}
         <motion.div
@@ -988,15 +1002,7 @@ export function HMI2Splash({ onDone }: { onDone: () => void }) {
           >
             CO₂ Laser System
           </div>
-          <div
-            style={{
-              fontSize: 14,
-              color: H.textDim,
-              letterSpacing: "0.08em",
-            }}
-          >
-            v3.3.0 &nbsp;·&nbsp; SN: LMX-2026-0847
-          </div>
+
         </motion.div>
         {/* Loading bar */}
         <motion.div
@@ -1020,9 +1026,9 @@ export function HMI2Splash({ onDone }: { onDone: () => void }) {
             }}
           >
             <motion.div
-              initial={{ width: "0%" }}
-              animate={{ width: "100%" }}
-              transition={{ duration: 2.6, ease: "easeInOut" }}
+              initial={{ width: forcedProgress === undefined ? "0%" : `${forcedProgress}%` }}
+              animate={{ width: forcedProgress === undefined ? "100%" : `${forcedProgress}%` }}
+              transition={forcedProgress === undefined ? { duration: 2.6, ease: "easeInOut" } : { duration: 0 }}
               style={{
                 height: "100%",
                 borderRadius: 999,
@@ -1057,9 +1063,11 @@ export function HMI2Splash({ onDone }: { onDone: () => void }) {
 export function HMI2Home({
   onCOS,
   onFRX,
+  forcedActive = null,
 }: {
   onCOS: () => void;
   onFRX: () => void;
+  forcedActive?: "cos" | "frx" | null;
 }) {
   const [hov, setHov] = useState<string | null>(null);
   const [pressed, setPressed] = useState<string | null>(null);
@@ -1221,7 +1229,7 @@ export function HMI2Home({
             icon,
           }) => {
             const isHov = hov === id;
-            const isPressed = pressed === id;
+            const isPressed = forcedActive === id || pressed === id;
             return (
               <div
                 key={id}
@@ -1349,7 +1357,7 @@ function HSectionLabel({
   return (
     <div
       style={{
-        fontSize: 16,
+        fontSize: 18,
         color: H.textSub,
         textTransform: "uppercase",
         letterSpacing: "0.08em",
@@ -1463,19 +1471,24 @@ function HModeBtn({
   active,
   onClick,
   color,
+  fill = false,
+  prominent = false,
 }: {
   label: string;
   icon: React.ReactNode;
   active: boolean;
   onClick: () => void;
   color: string;
+  fill?: boolean;
+  prominent?: boolean;
 }) {
   return (
     <button
       onClick={onClick}
       style={{
         flex: 1,
-        height: 80,
+        height: fill ? "100%" : LAYOUT.modeBtnHeight,
+        minHeight: LAYOUT.modeBtnHeight,
         borderRadius: 12,
         border: `1px solid ${active ? color : H.border}`,
         background: active
@@ -1494,13 +1507,15 @@ function HModeBtn({
       <div
         style={{
           width: "100%",
-          height: 32,
+          height: prominent ? 42 : 36,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           lineHeight: 0,
           opacity: active ? 1 : 0.45,
-          transform: active ? "scale(1.1)" : "scale(1)",
+          transform: active
+            ? `scale(${prominent ? 1.38 : 1.2})`
+            : `scale(${prominent ? 1.24 : 1.1})`,
           transition: "transform 0.14s",
         }}
       >
@@ -1508,12 +1523,12 @@ function HModeBtn({
       </div>
       <span
         style={{
-          fontSize: 14,
+          fontSize: prominent ? 18 : 16,
           fontWeight: active ? 700 : 500,
           letterSpacing: "0.08em",
           lineHeight: 1.2,
           textAlign: "center",
-          height: 15,
+          minHeight: 17,
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
@@ -1543,10 +1558,12 @@ export function HMI2COS({
   s,
   upd,
   onMenu,
+  forcedParam,
 }: {
   s: HMIState2;
   upd: (p: Partial<HMIState2>) => void;
   onMenu: (k: "memo" | "call" | "save") => void;
+  forcedParam?: "power" | "duration" | "interval";
 }) {
   const locked = s.laserState === "lasering";
   const [activeCosParam, setActiveCosParam] = useState<
@@ -1575,7 +1592,8 @@ export function HMI2COS({
       onInc: () => upd({ co2Interval: adjVal(s.co2Interval, 1, 1, 100, 1) }),
     },
   };
-  const selectedCosParam = cosParams[activeCosParam];
+  const selectedCosParamKey = forcedParam ?? activeCosParam;
+  const selectedCosParam = cosParams[selectedCosParamKey];
 
   const laserModeIcons: {
     CW: React.ReactNode;
@@ -1732,7 +1750,7 @@ export function HMI2COS({
       {/* LEFT panel */}
       <div
         style={{
-          width: "44%",
+          width: "50%",
           flexShrink: 0,
           display: "flex",
           flexDirection: "column",
@@ -1742,12 +1760,12 @@ export function HMI2COS({
         {/* LASER MODE */}
         <div
           style={{
-            padding: "16px",
+            padding: "18px",
             borderBottom: `1px solid ${H.border}`,
           }}
         >
           <HSectionLabel>LASER MODE</HSectionLabel>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", gap: 12 }}>
             {(["CW", "Pulse"] as const).map((m) => (
               <HModeBtn
                 key={m}
@@ -1756,18 +1774,22 @@ export function HMI2COS({
                 active={s.co2LaserMode === m}
                 onClick={() => upd({ co2LaserMode: m })}
                 color={H.cyan}
+                prominent
               />
             ))}
           </div>
         </div>
         {/* PULSE MODE */}
-        <div style={{ padding: "16px", flex: 1 }}>
+        <div style={{ padding: "18px", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
           <HSectionLabel>PULSE MODE</HSectionLabel>
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
-              gap: 10,
+              gridTemplateRows: "1fr 1fr",
+              gap: 12,
+              flex: 1,
+              minHeight: 0,
             }}
           >
             {(
@@ -1780,6 +1802,8 @@ export function HMI2COS({
                 active={s.co2PulseMode === m}
                 onClick={() => upd({ co2PulseMode: m })}
                 color={H.cyan}
+                fill
+                prominent
               />
             ))}
           </div>
@@ -1809,22 +1833,23 @@ export function HMI2COS({
               width: "100%",
               display: "grid",
               gridTemplateColumns: "repeat(3, 1fr)",
-              gap: 8,
+              gap: 12,
             }}
           >
             {(Object.keys(cosParams) as Array<keyof typeof cosParams>).map((key) => {
-              const active = activeCosParam === key;
+              const active = selectedCosParamKey === key;
               return (
                 <button
                   key={key}
                   onClick={() => setActiveCosParam(key)}
                   style={{
-                    height: 46,
+                    height: 50,
                     borderRadius: 10,
                     border: `1px solid ${active ? H.cyan : H.border}`,
                     background: active ? H.cyanDim : "rgba(255,255,255,0.03)",
                     color: active ? H.cyan : H.textSub,
-                    fontSize: 14,
+                    fontSize: 16,
+                    lineHeight: 1.25,
                     fontWeight: active ? 700 : 500,
                     letterSpacing: "0.05em",
                     cursor: "pointer",
@@ -1883,10 +1908,12 @@ export function HMI2FRX({
   s,
   upd,
   onMenu,
+  forcedParam,
 }: {
   s: HMIState2;
   upd: (p: Partial<HMIState2>) => void;
   onMenu: (k: "memo" | "call" | "save") => void;
+  forcedParam?: "power" | "degree" | "density" | "pause";
 }) {
   const locked = s.laserState === "lasering";
   const [sizeLocked, setSizeLocked] = useState(false);
@@ -1923,7 +1950,8 @@ export function HMI2FRX({
       onInc: () => upd({ frxPauseTime: adjVal(s.frxPauseTime, 0.1, 0.1, 5, 0.1) }),
     },
   };
-  const selectedParam = frxParams[activeParam];
+  const selectedParamKey = forcedParam ?? activeParam;
+  const selectedParam = frxParams[selectedParamKey];
 
   const shapes: [string, React.ReactNode][] = [
     [
@@ -2062,7 +2090,7 @@ export function HMI2FRX({
       {/* LEFT panel */}
       <div
         style={{
-          width: "44%",
+          width: "50%",
           flexShrink: 0,
           display: "flex",
           flexDirection: "column",
@@ -2072,12 +2100,12 @@ export function HMI2FRX({
         {/* SHAPE */}
         <div
           style={{
-            padding: "16px",
+            padding: "18px",
             borderBottom: `1px solid ${H.border}`,
           }}
         >
           <HSectionLabel>SHAPE</HSectionLabel>
-          <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ display: "flex", gap: 12 }}>
             {shapes.map(([v, svg]) => {
               const active =
                 s.frxShape === (v as typeof s.frxShape);
@@ -2089,7 +2117,7 @@ export function HMI2FRX({
                   }
                   style={{
                     flex: 1,
-                    height: 68,
+                    height: LAYOUT.shapeBtnHeight,
                     borderRadius: 12,
                     border: `1px solid ${active ? H.blue : H.border}`,
                     background: active
@@ -2130,7 +2158,7 @@ export function HMI2FRX({
                       fontWeight: active ? 700 : 400,
                       lineHeight: 1.2,
                       textAlign: "center",
-                      height: 15,
+                      minHeight: 17,
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
@@ -2147,12 +2175,12 @@ export function HMI2FRX({
         {/* SCAN MODE */}
         <div
           style={{
-            padding: "16px",
+            padding: "18px",
             borderBottom: `1px solid ${H.border}`,
           }}
         >
           <HSectionLabel>SCAN MODE</HSectionLabel>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display: "flex", gap: 12 }}>
             {(["Lining", "Random"] as const).map((m) => (
               <HModeBtn
                 key={m}
@@ -2241,7 +2269,7 @@ export function HMI2FRX({
                   }
                   style={{
                     width: "100%",
-                    height: 46,
+                    height: 50,
                     borderRadius: "10px 10px 0 0",
                     border: "none",
                     borderBottom: `1px solid ${H.border}`,
@@ -2396,11 +2424,11 @@ export function HMI2FRX({
               width: "100%",
               display: "grid",
               gridTemplateColumns: "repeat(4, 1fr)",
-              gap: 8,
+              gap: 12,
             }}
           >
             {(Object.keys(frxParams) as Array<keyof typeof frxParams>).map((key) => {
-              const active = activeParam === key;
+              const active = selectedParamKey === key;
               return (
                 <button
                   key={key}
@@ -2411,7 +2439,8 @@ export function HMI2FRX({
                     border: `1px solid ${active ? H.blue : H.border}`,
                     background: active ? H.blueDim : "rgba(255,255,255,0.03)",
                     color: active ? H.blue : H.textSub,
-                    fontSize: 14,
+                    fontSize: 16,
+                    lineHeight: 1.25,
                     fontWeight: active ? 700 : 500,
                     letterSpacing: "0.05em",
                     cursor: "pointer",
@@ -3185,6 +3214,7 @@ export function HMIRoot2({ onStateChange }: { onStateChange?: (s: HMIState2) => 
           soundOn={s.soundOn}
           aimingLevel={s.aimingLevel}
           onMenu={isTreatment ? setOverlay : undefined}
+          activeMenu={overlay === "memo" || overlay === "call" || overlay === "save" ? overlay : null}
           cameraActive={overlay === "camera"}
           onCamera={() => setOverlay("camera")}
           onSound={() => upd({ soundOn: !s.soundOn })}

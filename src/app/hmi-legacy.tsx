@@ -3553,15 +3553,7 @@ function HMI2Splash({ onDone }: { onDone: () => void }) {
           >
             CO₂ Laser System
           </div>
-          <div
-            style={{
-              fontSize: 9,
-              color: H.textDim,
-              letterSpacing: "0.08em",
-            }}
-          >
-            v3.3.0 &nbsp;·&nbsp; SN: LMX-2026-0847
-          </div>
+
         </motion.div>
         {/* Loading bar */}
         <motion.div
