@@ -23,7 +23,7 @@ import {
   HMIState2, HMI2_DEFAULT, LaserState2,
   HTopBar, HLaserBar,
   HMI2Splash, HMI2Home, HMI2COS, HMI2FRX,
-  HMemoModal, HCallModal, HSaveModal,
+  HModal, HMemoModal, HCallModal, HSaveModal,
 } from "./hmi2";
 
 // ── noop helpers ──────────────────────────────────────────────────────────────
@@ -31,6 +31,20 @@ const noop = () => {};
 const noopUpd = (_: Partial<HMIState2>) => {};
 const noopMenu = (_: "memo" | "call" | "save") => {};
 const noopAim  = (_: 0|1|2|3|4|5) => {};
+
+function HCameraModal() {
+  return (
+    <HModal title="Camera Preview" badge="CAMERA" onClose={noop}>
+      <div style={{ height:300, borderRadius:14, border:`1px solid ${H.borderB}`, background:"rgba(0,0,0,0.42)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, color:H.textSub }}>
+        <svg width={42} height={42} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}>
+          <path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5Z" />
+          <circle cx="12" cy="13" r="3.5" />
+        </svg>
+        <span style={{ fontSize:16, fontWeight:600 }}>Camera Preview</span>
+      </div>
+    </HModal>
+  );
+}
 
 // ── Base states ───────────────────────────────────────────────────────────────
 const COS_BASE: HMIState2 = {
@@ -298,11 +312,12 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
     overlay?: React.ReactNode,
     children?: React.ReactNode,
     activeMenu?: "memo"|"call"|"save"|null,
+    cameraActive = false,
   ): FrameDef => ({
     id, name,
     render: () => (
       <div data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif", flexShrink:0 }}>
-        {showTopBar && <HTopBar mode={mode} onBack={mode ? noop : undefined} soundOn={s?.soundOn??true} aimingLevel={(s?.aimingLevel??2) as 0|1|2|3|4|5} onMenu={mode ? noopMenu : undefined} activeMenu={activeMenu} onCamera={noop} onSound={noop} onAiming={noopAim} />}
+        {showTopBar && <HTopBar mode={mode} onBack={mode ? noop : undefined} soundOn={s?.soundOn??true} aimingLevel={(s?.aimingLevel??2) as 0|1|2|3|4|5} onMenu={mode ? noopMenu : undefined} activeMenu={activeMenu} cameraActive={cameraActive} onCamera={noop} onSound={noop} onAiming={noopAim} />}
         <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", position:"relative", minHeight:0 }}>
           <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
             {children ?? (
@@ -445,6 +460,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
         buildFrame("COS-021","Paused",            "cos", cos({ laserState:"paused" }),                                      true, true),
         buildFrame("COS-022","Parameter Duration", "cos", cos({}),                                                           true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="duration" />),
         buildFrame("COS-023","Parameter Interval", "cos", cos({}),                                                           true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="interval" />),
+        buildFrame("COS-024","Camera Preview",     "cos", cos({}),                                                           true, true, <HCameraModal />, undefined, null, true),
       ],
     },
     {
@@ -480,6 +496,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
         buildFrame("FRX-028","Width Minus Active", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxWidth-dec" />),
         buildFrame("FRX-029","Length Plus Active", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxLength-inc" />),
         buildFrame("FRX-030","Length Minus Active","frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxLength-dec" />),
+        buildFrame("FRX-031","Camera Preview",     "frx", frx({}),                                                            true, true, <HCameraModal />, undefined, null, true),
       ],
     },
   ];
