@@ -96,10 +96,11 @@ export const LAYOUT = {
   sectionContentGap:   14,    // Header와 콘텐츠 사이 간격
   sectionAccentGap:    12,    // Accent bar와 제목 사이 간격
   sectionAccentHeight: 22,    // 공통 Accent bar 높이
+  sectionTitleFontSize: 18,   // LASER/PULSE MODE, PARAMETERS 공통 제목 크기
 
   // ── Aiming 드롭다운 ───────────────────────────────────────────────────────────
   aimDropTop:          58,    // topbar 기준 top 위치
-  aimDropRight:        63,    // 우측 여백
+  aimDropRight:        71,    // 우측 여백
   aimDropWidth:        145,   // 드롭다운 너비
   aimDropItemHeight:   42,    // 항목 높이
   aimDropRadius:       12,    // 모서리
@@ -173,7 +174,7 @@ function HParamCol({
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        minWidth: emphasized ? 240 : 120,
+        minWidth: emphasized ? 288 : 136,
         gap: 0,
       }}
     >
@@ -185,8 +186,8 @@ function HParamCol({
         onPointerLeave={() => setPressedControl(null)}
         style={{
           width: "100%",
-          height: emphasized ? 72 : 44,
-          padding: emphasized ? "14px 0" : "8px 0",
+          height: emphasized ? 84 : 50,
+          padding: emphasized ? "18px 0" : "10px 0",
           boxSizing: "border-box",
           borderRadius: "10px 10px 0 0",
           border: "1px solid rgba(255,255,255,0.08)",
@@ -214,7 +215,7 @@ function HParamCol({
       <div
         style={{
           width: "100%",
-          padding: emphasized ? "20px 0" : "14px 0",
+          padding: emphasized ? "52px 0" : "18px 0",
           background: "rgba(0,0,0,0.3)",
           display: "flex",
           flexDirection: "column",
@@ -226,7 +227,7 @@ function HParamCol({
           style={{
             display: "flex",
             alignItems: "baseline",
-            gap: 4,
+            gap: 6,
           }}
         >
           <span
@@ -260,8 +261,8 @@ function HParamCol({
         onPointerLeave={() => setPressedControl(null)}
         style={{
           width: "100%",
-          height: emphasized ? 72 : 44,
-          padding: emphasized ? "14px 0" : "8px 0",
+          height: emphasized ? 84 : 50,
+          padding: emphasized ? "18px 0" : "10px 0",
           boxSizing: "border-box",
           borderRadius: "0 0 10px 10px",
           border: "1px solid rgba(255,255,255,0.08)",
@@ -286,17 +287,17 @@ function HParamCol({
       >
         −
       </button>
-      <div
-        style={{
-          marginTop: 12,
-          fontSize: 14,
-          color: H.textSub,
-          textTransform: "uppercase",
-          letterSpacing: "0.1em",
-        }}
-      >
-        {label}
-      </div>
+      {/*<div*/}
+      {/*  style={{*/}
+      {/*    marginTop: 12,*/}
+      {/*    fontSize: 14,*/}
+      {/*    color: H.textSub,*/}
+      {/*    textTransform: "uppercase",*/}
+      {/*    letterSpacing: "0.1em",*/}
+      {/*  }}*/}
+      {/*>*/}
+      {/*  {label}*/}
+      {/*</div>*/}
     </div>
   );
 }
@@ -1237,7 +1238,9 @@ export function HMI2Home({
             icon,
           }) => {
             const isHov = hov === id;
-            const isPressed = forcedActive === id || pressed === id;
+            const isActive = forcedActive === id;
+            const isPressed = pressed === id;
+            const isHighlighted = isActive || isHov || isPressed;
             return (
               <div
                 key={id}
@@ -1267,15 +1270,16 @@ export function HMI2Home({
                   WebkitAppearance: "none",
                   boxSizing: "border-box",
                   borderRadius: 18,
-                  border: `${isPressed ? 2 : 1}px solid ${
-                    isPressed ? color + "b8" : isHov ? color + "80" : H.border
-                  }`,
-                  backgroundColor: isPressed
-                    ? `${color}20`
-                    : isHov
-                      ? "rgba(20,35,63,0.98)"
-                      : "rgba(16,27,48,0.96)",
-                  backgroundImage: "none",
+                  border: `1px solid ${isHighlighted ? color + "80" : H.border}`,
+                  backgroundColor: isHighlighted
+                    ? "rgba(20,35,63,0.98)"
+                    : "rgba(16,27,48,0.96)",
+                  backgroundImage: isHighlighted
+                    ? `linear-gradient(180deg, ${color}14 0%, rgba(255,255,255,0.015) 100%)`
+                    : "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.008) 100%)",
+                  boxShadow: isHighlighted
+                    ? `inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -4px 10px rgba(0,0,0,0.16), 0 6px 14px rgba(0,0,0,0.30), 0 0 16px ${color}10`
+                    : "inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -4px 10px rgba(0,0,0,0.14), 0 5px 12px rgba(0,0,0,0.26)",
                   backgroundClip: "padding-box",
                   outline: "none",
                   overflow: "hidden",
@@ -1285,6 +1289,7 @@ export function HMI2Home({
                   alignItems: "flex-start",
                   justifyContent: "center",
                   padding: "34px 34px 30px",
+                  transform: isPressed ? "translateY(1px)" : "none",
                   transition: "all 0.18s",
                 }}
               >
@@ -1357,41 +1362,6 @@ export function HMI2Home({
 }
 
 // ── Section label ─────────────────────────────────────────────────────────────
-function HSectionLabel({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <div
-      style={{
-        fontSize: 18,
-        color: H.textSub,
-        textTransform: "uppercase",
-        letterSpacing: "0.08em",
-        lineHeight: 1.3,
-        fontWeight: 700,
-        padding: `${LAYOUT.sectionHeaderPadY}px 0`,
-        marginBottom: LAYOUT.sectionContentGap,
-        display: "flex",
-        alignItems: "center",
-        gap: LAYOUT.sectionAccentGap,
-      }}
-    >
-      <div
-        style={{
-          width: 2,
-          height: LAYOUT.sectionAccentHeight,
-          borderRadius: 1,
-          background: H.textDim,
-          flexShrink: 0,
-        }}
-      />
-      {children}
-    </div>
-  );
-}
-
 // ── PARAMETERS section header ─────────────────────────────────────────────────
 function HParamsHeader({
   label = "PARAMETERS",
@@ -1403,7 +1373,7 @@ function HParamsHeader({
   return (
     <div
       style={{
-        padding: `${14 + LAYOUT.sectionHeaderPadY}px 28px ${12 + LAYOUT.sectionHeaderPadY}px`,
+        padding: "20px 20px",
         borderBottom: `1px solid ${H.border}`,
         display: "flex",
         alignItems: "center",
@@ -1420,7 +1390,7 @@ function HParamsHeader({
       />
       <span
         style={{
-          fontSize: 18,
+          fontSize: LAYOUT.sectionTitleFontSize,
           color: H.text,
           textTransform: "uppercase",
           letterSpacing: "0.08em",
@@ -1500,8 +1470,11 @@ function HModeBtn({
         borderRadius: 12,
         border: `1px solid ${active ? color : H.border}`,
         background: active
-          ? `${color}1c`
-          : "rgba(255,255,255,0.03)",
+          ? `linear-gradient(180deg, ${color}32 0%, ${color}16 100%)`
+          : "linear-gradient(180deg, rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.045) 100%)",
+        boxShadow: active
+          ? `inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -2px 5px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.28), 0 0 12px ${color}14`
+          : "inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 5px rgba(0,0,0,0.18), 0 3px 6px rgba(0,0,0,0.28)",
         color: active ? color : H.textSub,
         cursor: "pointer",
         display: "flex",
@@ -1768,12 +1741,11 @@ export function HMI2COS({
         {/* LASER MODE */}
         <div
           style={{
-            padding: "18px",
             borderBottom: `1px solid ${H.border}`,
           }}
         >
-          <HSectionLabel>LASER MODE</HSectionLabel>
-          <div style={{ display: "flex", gap: 12 }}>
+          <HParamsHeader label="LASER MODE" accentColor={H.cyan} />
+          <div style={{ display: "flex", gap: 18, padding: 18 }}>
             {(["CW", "Pulse"] as const).map((m) => (
               <HModeBtn
                 key={m}
@@ -1788,16 +1760,17 @@ export function HMI2COS({
           </div>
         </div>
         {/* PULSE MODE */}
-        <div style={{ padding: "18px", flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
-          <HSectionLabel>PULSE MODE</HSectionLabel>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0 }}>
+          <HParamsHeader label="PULSE MODE" accentColor={H.cyan} />
           <div
             style={{
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               gridTemplateRows: "1fr 1fr",
-              gap: 12,
+              gap: 18,
               flex: 1,
               minHeight: 0,
+              padding: 18,
             }}
           >
             {(
@@ -1854,7 +1827,12 @@ export function HMI2COS({
                     height: 50,
                     borderRadius: 10,
                     border: `1px solid ${active ? H.cyan : H.border}`,
-                    background: active ? H.cyanDim : "rgba(255,255,255,0.03)",
+                    background: active
+                      ? "linear-gradient(180deg, rgba(0,202,228,0.20) 0%, rgba(0,202,228,0.08) 100%)"
+                      : "linear-gradient(180deg, rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.045) 100%)",
+                    boxShadow: active
+                      ? "inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -2px 5px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.28), 0 0 12px rgba(0,202,228,0.10)"
+                      : "inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 5px rgba(0,0,0,0.18), 0 3px 6px rgba(0,0,0,0.28)",
                     color: active ? H.cyan : H.textSub,
                     fontSize: 16,
                     lineHeight: 1.25,
@@ -2113,12 +2091,11 @@ export function HMI2FRX({
         {/* SHAPE */}
         <div
           style={{
-            padding: "18px",
             borderBottom: `1px solid ${H.border}`,
           }}
         >
-          <HSectionLabel>SHAPE</HSectionLabel>
-          <div style={{ display: "flex", gap: 12 }}>
+          <HParamsHeader label="SHAPE" />
+          <div style={{ display: "flex", gap: 12, padding: 18 }}>
             {shapes.map(([v, svg]) => {
               const active =
                 s.frxShape === (v as typeof s.frxShape);
@@ -2134,8 +2111,11 @@ export function HMI2FRX({
                     borderRadius: 12,
                     border: `1px solid ${active ? H.blue : H.border}`,
                     background: active
-                      ? H.blueDim
-                      : "rgba(255,255,255,0.03)",
+                      ? "linear-gradient(180deg, rgba(46,130,255,0.22) 0%, rgba(46,130,255,0.08) 100%)"
+                      : "linear-gradient(180deg, rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.045) 100%)",
+                    boxShadow: active
+                      ? "inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -2px 5px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.28), 0 0 12px rgba(46,130,255,0.10)"
+                      : "inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 5px rgba(0,0,0,0.18), 0 3px 6px rgba(0,0,0,0.28)",
                     color: active ? H.blue : H.textSub,
                     cursor: "pointer",
                     display: "flex",
@@ -2188,12 +2168,11 @@ export function HMI2FRX({
         {/* SCAN MODE */}
         <div
           style={{
-            padding: "18px",
             borderBottom: `1px solid ${H.border}`,
           }}
         >
-          <HSectionLabel>SCAN MODE</HSectionLabel>
-          <div style={{ display: "flex", gap: 12 }}>
+          <HParamsHeader label="SCAN MODE" />
+          <div style={{ display: "flex", gap: 18, padding: 18 }}>
             {(["Lining", "Random"] as const).map((m) => (
               <HModeBtn
                 key={m}
@@ -2222,7 +2201,7 @@ export function HMI2FRX({
             style={{
               width: "100%",
               display: "grid",
-              gridTemplateColumns: "minmax(0, 1fr) 44px minmax(0, 1fr)",
+              gridTemplateColumns: "minmax(0, 1fr) 56px minmax(0, 1fr)",
               alignItems: "center",
               gap: 10,
             }}
@@ -2415,9 +2394,9 @@ export function HMI2FRX({
                 aria-pressed={sizeLocked}
                 title={sizeLocked ? "Unlock width and length" : "Lock width and length"}
                 style={{
-                  width: 44,
-                  height: 44,
-                  borderRadius: 10,
+                  width: 56,
+                  height: 56,
+                  borderRadius: 12,
                   border: `1px solid ${sizeLocked ? H.blue : H.border}`,
                   background: sizeLocked ? H.blueDim : "rgba(255,255,255,0.03)",
                   color: sizeLocked ? H.blue : H.textSub,
@@ -2430,8 +2409,8 @@ export function HMI2FRX({
                 }}
               >
                 <svg
-                  width="20"
-                  height="20"
+                  width="26"
+                  height="26"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -2487,7 +2466,12 @@ export function HMI2FRX({
                     height: 46,
                     borderRadius: 10,
                     border: `1px solid ${active ? H.blue : H.border}`,
-                    background: active ? H.blueDim : "rgba(255,255,255,0.03)",
+                    background: active
+                      ? "linear-gradient(180deg, rgba(46,130,255,0.22) 0%, rgba(46,130,255,0.08) 100%)"
+                      : "linear-gradient(180deg, rgba(255,255,255,0.085) 0%, rgba(255,255,255,0.045) 100%)",
+                    boxShadow: active
+                      ? "inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -2px 5px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.28), 0 0 12px rgba(46,130,255,0.10)"
+                      : "inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 5px rgba(0,0,0,0.18), 0 3px 6px rgba(0,0,0,0.28)",
                     color: active ? H.blue : H.textSub,
                     fontSize: 16,
                     lineHeight: 1.25,
@@ -2537,7 +2521,7 @@ export function HModal({
   onClose,
   children,
 }: {
-  title: string;
+  title?: string;
   badge?: string;
   onClose: () => void;
   children: React.ReactNode;
@@ -2561,8 +2545,8 @@ export function HModal({
         exit={{ opacity: 0, scale: 0.96, y: 10 }}
         transition={{ duration: 0.18 }}
         style={{
-          width: 500,
-          maxHeight: 480,
+          width: "70%",
+          height: "70%",
           borderRadius: 20,
           background: "#0f1928",
           border: `1px solid ${H.borderB}`,
@@ -2668,7 +2652,7 @@ export function HMemoModal({ onClose }: { onClose: () => void }) {
   ]);
   const [draft, setDraft] = useState("");
   return (
-    <HModal title="메모 관리" badge="MEMO" onClose={onClose}>
+    <HModal  badge="MEMO" onClose={onClose}>
       <div
         style={{
           display: "flex",
@@ -2862,7 +2846,7 @@ export function HCallModal({
   const [sel, setSel] = useState<number | null>(null);
   const isCOS = s.screen === "cos";
   return (
-    <HModal title="프리셋 선택" badge="CALL" onClose={onClose}>
+    <HModal  badge="CALL" onClose={onClose}>
       <div
         style={{
           display: "flex",
@@ -3022,7 +3006,7 @@ export function HSaveModal({
       ];
   return (
     <HModal
-      title="현재 설정 저장"
+      //title="현재 설정 저장"
       badge="SAVE"
       onClose={onClose}
     >
@@ -3387,13 +3371,13 @@ export function HMIRoot2({ onStateChange }: { onStateChange?: (s: HMIState2) => 
           )}
           {overlay === "camera" && (
             <HModal
-              title="Camera Preview"
+              //title="Camera Preview"
               badge="CAMERA"
               onClose={() => setOverlay(null)}
             >
               <div
                 style={{
-                  height: 300,
+                  height: 388,
                   borderRadius: 14,
                   border: `1px solid ${H.borderB}`,
                   background: "rgba(0,0,0,0.42)",
