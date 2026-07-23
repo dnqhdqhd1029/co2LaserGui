@@ -233,8 +233,8 @@ function HParamCol({
           <span
             style={{
               fontFamily: "'JetBrains Mono',monospace",
-              fontSize: emphasized ? 48 : 32,
-              fontWeight: 400,
+              fontSize: emphasized ? 60 : 32,
+              fontWeight: 500,
               color: locked ? "#253448" : H.text,
               lineHeight: 1,
               letterSpacing: "-0.01em",
