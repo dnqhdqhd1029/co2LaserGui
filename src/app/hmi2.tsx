@@ -2632,6 +2632,58 @@ export function HModal({
 // │  States  : 1 BMP (팝업 배경) + 닫기 버튼 2-state                               │
 // │  Export  : Popup_10_Memo.bmp                                                 │
 // └─────────────────────────────────────────────────────────────────────────────┘
+export function HCameraModal({ onClose = () => {} }: { onClose?: () => void }) {
+  const guideColor = "rgba(0,202,228,0.42)";
+  const guideSoft = "rgba(0,202,228,0.14)";
+
+  return (
+    <HModal badge="CAMERA" onClose={onClose}>
+      <div
+        style={{
+          height: 388,
+          borderRadius: 14,
+          background: "rgba(0,0,0,0.42)",
+          position: "relative",
+          overflow: "hidden",
+          color: "rgb(78, 110, 154)",
+        }}
+      >
+        {/* Placeholder shown until the camera stream is connected. */}
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 2,
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "12px 18px", borderRadius: 10, background: "rgba(2,8,14,0.88)", boxShadow: "0 0 24px rgba(0,0,0,0.5)" }}>
+            <svg width={30} height={30} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}>
+              <path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5Z" />
+              <circle cx="12" cy="13" r="3.5" />
+            </svg>
+            <span style={{ fontSize: 13, fontWeight: 600 }}>Camera Preview</span>
+          </div>
+        </div>
+
+        {/* Camera alignment guide overlay */}
+        <div style={{ position: "absolute", inset: 24, pointerEvents: "none" }}>
+          <div style={{ position: "absolute", inset: 0, border: `1px solid ${guideSoft}` }} />
+          {/* Continuous intersecting lines form a true # guide. */}
+          {[33.333, 66.667].map((left) => (
+            <div key={`v-${left}`} style={{ position: "absolute", left: `${left}%`, top: 20, bottom: 20, width: 1, background: guideColor }} />
+          ))}
+          {[33.333, 66.667].map((top) => (
+            <div key={`h-${top}`} style={{ position: "absolute", top: `${top}%`, left: 20, right: 20, height: 1, background: guideColor }} />
+          ))}
+        </div>
+      </div>
+    </HModal>
+  );
+}
+
 export function HMemoModal({ onClose }: { onClose: () => void }) {
   const [memos, setMemos] = useState([
     {
@@ -3370,32 +3422,7 @@ export function HMIRoot2({ onStateChange }: { onStateChange?: (s: HMIState2) => 
             />
           )}
           {overlay === "camera" && (
-            <HModal
-              //title="Camera Preview"
-              badge="CAMERA"
-              onClose={() => setOverlay(null)}
-            >
-              <div
-                style={{
-                  height: 388,
-                  borderRadius: 14,
-                  border: `1px solid ${H.borderB}`,
-                  background: "rgba(0,0,0,0.42)",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: 14,
-                  color: H.textSub,
-                }}
-              >
-                <svg width={42} height={42} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}>
-                  <path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5Z" />
-                  <circle cx="12" cy="13" r="3.5" />
-                </svg>
-                <span style={{ fontSize: 16, fontWeight: 600 }}>Camera Preview</span>
-              </div>
-            </HModal>
+            <HCameraModal onClose={() => setOverlay(null)} />
           )}
         </AnimatePresence>
       </div>

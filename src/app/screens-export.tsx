@@ -23,7 +23,7 @@ import {
   HMIState2, HMI2_DEFAULT, LaserState2,
   HTopBar, HLaserBar,
   HMI2Splash, HMI2Home, HMI2COS, HMI2FRX,
-  HModal, HMemoModal, HCallModal, HSaveModal,
+  HModal, HCameraModal, HMemoModal, HCallModal, HSaveModal,
 } from "./hmi2";
 
 // ── noop helpers ──────────────────────────────────────────────────────────────
@@ -31,20 +31,6 @@ const noop = () => {};
 const noopUpd = (_: Partial<HMIState2>) => {};
 const noopMenu = (_: "memo" | "call" | "save") => {};
 const noopAim  = (_: 0|1|2|3|4|5) => {};
-
-function HCameraModal({ onClose = noop }: { onClose?: () => void }) {
-  return (
-    <HModal badge="CAMERA" onClose={onClose}>
-      <div style={{ height:388, borderRadius:14, border:`1px solid ${H.borderB}`, background:"rgba(0,0,0,0.42)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, color:H.textSub }}>
-        <svg width={42} height={42} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}>
-          <path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5Z" />
-          <circle cx="12" cy="13" r="3.5" />
-        </svg>
-        <span style={{ fontSize:16, fontWeight:600 }}>Camera Preview</span>
-      </div>
-    </HModal>
-  );
-}
 
 // ── Base states ───────────────────────────────────────────────────────────────
 const COS_BASE: HMIState2 = {
