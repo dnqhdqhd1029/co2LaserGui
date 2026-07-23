@@ -32,10 +32,10 @@ const noopUpd = (_: Partial<HMIState2>) => {};
 const noopMenu = (_: "memo" | "call" | "save") => {};
 const noopAim  = (_: 0|1|2|3|4|5) => {};
 
-function HCameraModal() {
+function HCameraModal({ onClose = noop }: { onClose?: () => void }) {
   return (
-    <HModal title="Camera Preview" badge="CAMERA" onClose={noop}>
-      <div style={{ height:300, borderRadius:14, border:`1px solid ${H.borderB}`, background:"rgba(0,0,0,0.42)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, color:H.textSub }}>
+    <HModal badge="CAMERA" onClose={onClose}>
+      <div style={{ height:388, borderRadius:14, border:`1px solid ${H.borderB}`, background:"rgba(0,0,0,0.42)", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:14, color:H.textSub }}>
         <svg width={42} height={42} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6}>
           <path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5Z" />
           <circle cx="12" cy="13" r="3.5" />
@@ -185,6 +185,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
   // single, top-level child returned by FrameDef.render().
   const previewMountRef = useRef<HTMLDivElement>(null);
   const [exporting, setExporting] = useState(false);
+  const [liveCameraOpen, setLiveCameraOpen] = useState(false);
 
   const exportPNG = useCallback(async (filename: string) => {
     const screenFrame = previewMountRef.current?.firstElementChild;
@@ -347,7 +348,8 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
             onBack={liveScreen==="cos"||liveScreen==="frx" ? noop : undefined}
             soundOn={liveState.soundOn} aimingLevel={liveState.aimingLevel}
             onMenu={liveScreen==="cos"||liveScreen==="frx" ? noopMenu : undefined}
-            onCamera={noop}
+            cameraActive={liveCameraOpen}
+            onCamera={() => setLiveCameraOpen(true)}
             onSound={noop} onAiming={noopAim} />
         )}
         <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", position:"relative", minHeight:0 }}>
@@ -359,6 +361,9 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
           </div>
         </div>
         {(liveScreen==="cos"||liveScreen==="frx") && <HLaserBar state={liveState.laserState} onPress={noop} />}
+        {liveCameraOpen && (liveScreen==="cos"||liveScreen==="frx") && (
+          <HCameraModal onClose={() => setLiveCameraOpen(false)} />
+        )}
         {/* LIVE badge */}
         <div style={{ position:"absolute", top:8, right:8, padding:"3px 9px", borderRadius:6, background:"rgba(234,179,8,0.2)", border:"1px solid rgba(234,179,8,0.5)", color:"#fde047", fontSize: 14, fontWeight:700, letterSpacing:"0.1em", zIndex:100 }}>
           ● LIVE
