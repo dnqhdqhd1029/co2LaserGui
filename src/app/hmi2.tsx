@@ -2229,7 +2229,9 @@ export function HMI2FRX({
                                             transition: "all 0.14s",
                                             border: `var(--hmi-selected-border-width) solid ${sizeLocked ? H.blue : H.border}`,
                                             background: sizeLocked ? H.blueDim : "rgba(255,255,255,0.03)",
-                                            color: sizeLocked ? H.blue : H.textSub
+                                            color: sizeLocked ? H.blue : H.textSub,
+                                            marginTop: "33px"
+
                                         }}
                                     >
                                         <svg
