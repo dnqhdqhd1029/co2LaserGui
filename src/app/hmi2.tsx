@@ -1125,7 +1125,7 @@ export function HMI2Home({
                 display: "flex",
                 flexDirection: "column",
                 backgroundColor: "#09101F",
-                backgroundImage: `linear-gradient(rgba(9,16,31,0.42), rgba(9,16,31,0.58)), url(${modeSelectBackground})`,
+                backgroundImage: `linear-gradient(rgba(9,16,31,0.15), rgba(9,16,31,0.25)), url(${modeSelectBackground})`,
                 backgroundSize: "cover",
                 backgroundPosition: "center",
                 backgroundRepeat: "no-repeat",
