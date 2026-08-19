@@ -582,7 +582,7 @@
     height: 70%;
     border-radius: 20px;
     background: #0f1928;
-    border: 1px solid rgba(42, 110, 220, .35);
+    border: 3px solid rgba(42, 110, 220, .55);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -593,13 +593,13 @@
     align-items: center;
     gap: 10px;
     padding: 18px 22px;
-    border-bottom: 1px solid var(--hmi-border);
+    border-bottom: 2px solid var(--hmi-border);
     flex-shrink: 0;
 }
 
 .hmi-modal__badge {
-    font-size: 14px;
-    padding: 2px 8px;
+    font-size: 18px;
+    padding: 4px 10px;
     border-radius: 5px;
     background: rgba(30, 126, 245, .18);
     border: 1px solid rgba(30, 126, 245, .25);
@@ -611,19 +611,18 @@
 .hmi-modal__title {
     flex: 1;
     color: #d8e8ff;
-    font-size: 14px;
+    font-size: 20px;
     font-weight: 700;
     letter-spacing: .04em;
 }
 
 .hmi-modal__close {
-    width: 30px;
-    height: 30px;
+    width: 42px;
+    height: 42px;
     border-radius: 8px;
     border: 1px solid var(--hmi-border);
     background: rgba(255, 255, 255, .05);
     color: var(--hmi-text-secondary);
-    font-size: 18px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -631,10 +630,54 @@
     line-height: 1;
 }
 
+.hmi-modal__close svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+}
+
+.hmi-modal__keyboard-toggle {
+    width: 42px;
+    height: 42px;
+    border-radius: 8px;
+    border: 1px solid var(--hmi-border);
+    background: rgba(255, 255, 255, .05);
+    color: var(--hmi-text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hmi-modal__keyboard-toggle[aria-pressed="true"] {
+    border-color: rgba(30, 126, 245, .7);
+    background: rgba(30, 126, 245, .16);
+    color: #8abcf8;
+}
+
+.hmi-modal__keyboard-toggle svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
 .hmi-modal__body {
     flex: 1;
+    position: relative;
     overflow-y: auto;
     padding: 18px 22px;
+    font-size: 16px;
+}
+
+.hmi-modal__body--camera {
+    overflow: hidden;
+}
+
+.hmi-modal__body--camera .hmi-camera-card {
+    height: 100%;
 }
 
 .hmi-popup-list {
@@ -686,13 +729,13 @@
 .hmi-memo-card__date {
     margin-bottom: 4px;
     color: var(--hmi-text-secondary);
-    font-size: 14px;
+    font-size: 16px;
     letter-spacing: .06em;
 }
 
 .hmi-memo-card__text {
     color: #d8e8ff;
-    font-size: 14px;
+    font-size: 17px;
     line-height: 1.5;
 }
 
@@ -721,14 +764,14 @@
 .hmi-save-param-card__key {
     margin-bottom: 2px;
     color: var(--hmi-text-secondary);
-    font-size: 14px;
+    font-size: 16px;
     text-transform: uppercase;
 }
 
 .hmi-save-param-card__value {
     color: #d8e8ff;
     font-family: "JetBrains Mono", monospace;
-    font-size: 14px;
+    font-size: 17px;
     font-weight: 500;
 }
 
@@ -739,6 +782,78 @@
     position: relative;
     overflow: hidden;
     color: rgb(78, 110, 154);
+}
+
+.hmi-camera-keyboard {
+    position: absolute;
+    z-index: 10;
+    left: 22px;
+    right: 22px;
+    bottom: 18px;
+    padding: 10px;
+    border: 1px solid rgba(42, 110, 220, .35);
+    border-radius: 12px;
+    background: rgba(5, 12, 24, .96);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, .42);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.hmi-camera-keyboard__header {
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--hmi-text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .1em;
+}
+
+.hmi-camera-keyboard__close {
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, .05);
+    color: #8aa6c4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.hmi-camera-keyboard__close svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.2;
+    stroke-linecap: round;
+}
+
+.hmi-camera-keyboard__row {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.hmi-camera-keyboard__key {
+    min-width: 42px;
+    height: 34px;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 7px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .09), rgba(255, 255, 255, .035));
+    color: #d8e8ff;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.hmi-camera-keyboard__key--wide {
+    min-width: 72px;
+}
+
+.hmi-camera-keyboard__key--space {
+    width: 240px;
 }
 
 .hmi-camera-card__placeholder {

@@ -2344,11 +2344,15 @@ export function HModal({
                            title,
                            badge,
                            onClose,
+                           headerAction,
+                           bodyClassName,
                            children,
                        }: {
     title?: string;
     badge?: string;
     onClose: () => void;
+    headerAction?: React.ReactNode;
+    bodyClassName?: string;
     children: React.ReactNode;
 }) {
     return (
@@ -2369,14 +2373,18 @@ export function HModal({
                     <span className="hmi-modal__title">
             {title}
           </span>
+                    {headerAction}
                     <button
                         onClick={onClose}
                         className="hmi-modal__close"
+                        aria-label="닫기"
                     >
-                        ×
+                        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 5L19 19M19 5L5 19"/>
+                        </svg>
                     </button>
                 </div>
-                <div className="hmi-modal__body">
+                <div className={`hmi-modal__body${bodyClassName ? ` ${bodyClassName}` : ""}`}>
                     {children}
                 </div>
             </motion.div>
@@ -2396,9 +2404,45 @@ export function HCameraModal({
                              }: { onClose?: () => void }) {
     const guideColor = "rgba(0,202,228,0.42)";
     const guideSoft = "rgba(0,202,228,0.14)";
+    const [keyboardOpen, setKeyboardOpen] = useState(false);
+    const [keyboardLayout, setKeyboardLayout] = useState<"ko" | "en" | "symbol">("ko");
+    const keyboardRows = keyboardLayout === "ko"
+        ? [
+            ["ㅂ", "ㅈ", "ㄷ", "ㄱ", "ㅅ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ"],
+            ["ㅁ", "ㄴ", "ㅇ", "ㄹ", "ㅎ", "ㅗ", "ㅓ", "ㅏ", "ㅣ"],
+            ["ㅋ", "ㅌ", "ㅊ", "ㅍ", "ㅠ", "ㅜ", "ㅡ"]
+        ]
+        : keyboardLayout === "en"
+            ? [
+                ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+                ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+                ["Z", "X", "C", "V", "B", "N", "M"]
+            ]
+            : [
+                ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"],
+                ["!", "@", "#", "$", "%", "^", "&", "*", "(", ")"],
+                ["-", "_", "+", "=", "/", "?", ":", ";", ".", ","]
+            ];
 
     return (
-        <HModal badge="CAMERA" onClose={onClose}>
+        <HModal
+            badge="CAMERA"
+            onClose={onClose}
+            bodyClassName="hmi-modal__body--camera"
+            headerAction={(
+                <button
+                    className="hmi-modal__keyboard-toggle"
+                    onClick={() => setKeyboardOpen((open) => !open)}
+                    aria-label="키보드 열기"
+                    aria-pressed={keyboardOpen}
+                >
+                    <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="2.5" y="5" width="19" height="14" rx="2"/>
+                        <path d="M6 9h1M10 9h1M14 9h1M18 9h.1M6 13h1M10 13h1M14 13h1M18 13h.1M7 16h10"/>
+                    </svg>
+                </button>
+            )}
+        >
             <div className="hmi-camera-card">
                 {/* Placeholder shown until the camera stream is connected. */}
                 <div className="hmi-camera-card__placeholder">
@@ -2415,7 +2459,7 @@ export function HCameraModal({
 
                 {/* Camera alignment guide overlay */}
                 <div style={{position: "absolute", inset: 24, pointerEvents: "none"}}>
-                    <div style={{position: "absolute", inset: 0, border: `1px solid ${guideSoft}`}}/>
+                    <div style={{position: "absolute", inset: 0, border: `1px dashed ${guideSoft}`}}/>
                     {/* Continuous intersecting lines form a true # guide. */}
                     {[33.333, 66.667].map((left) => (
                         <div key={`v-${left}`} style={{
@@ -2423,8 +2467,7 @@ export function HCameraModal({
                             left: `${left}%`,
                             top: 20,
                             bottom: 20,
-                            width: 1,
-                            background: guideColor
+                            borderLeft: `1px dashed ${guideColor}`
                         }}/>
                     ))}
                     {[33.333, 66.667].map((top) => (
@@ -2433,12 +2476,50 @@ export function HCameraModal({
                             top: `${top}%`,
                             left: 20,
                             right: 20,
-                            height: 1,
-                            background: guideColor
+                            borderTop: `1px dashed ${guideColor}`
                         }}/>
                     ))}
                 </div>
             </div>
+            {keyboardOpen && (
+                <div className="hmi-camera-keyboard">
+                    <div className="hmi-camera-keyboard__header">
+                        <span>KEYBOARD</span>
+                        <button
+                            className="hmi-camera-keyboard__close"
+                            onClick={() => setKeyboardOpen(false)}
+                            aria-label="키보드 닫기"
+                        >
+                            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M5 5L19 19M19 5L5 19"/>
+                            </svg>
+                        </button>
+                    </div>
+                    {keyboardRows.map((row, rowIndex) => (
+                        <div className="hmi-camera-keyboard__row" key={rowIndex}>
+                            {row.map((key) => (
+                                <button className="hmi-camera-keyboard__key" key={key}>{key}</button>
+                            ))}
+                        </div>
+                    ))}
+                    <div className="hmi-camera-keyboard__row">
+                        <button
+                            className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide"
+                            onClick={() => setKeyboardLayout((layout) => layout === "ko" ? "en" : "ko")}
+                        >
+                            한/영
+                        </button>
+                        <button
+                            className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide"
+                            onClick={() => setKeyboardLayout((layout) => layout === "symbol" ? "ko" : "symbol")}
+                        >
+                            {keyboardLayout === "symbol" ? "가나다" : "!#1"}
+                        </button>
+                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--space">SPACE</button>
+                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide">⌫</button>
+                    </div>
+                </div>
+            )}
         </HModal>
     );
 }
