@@ -95,7 +95,7 @@ function StaticFrame({
         }}>1024 × 768  ·  PNG Export</span>
       </div>
       {/* 1024×768 canvas */}
-      <div style={{
+      <div className="hmi-root" style={{
         width: LAYOUT.canvasW,
         height: LAYOUT.canvasH,
         display: "flex",
@@ -303,7 +303,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
   ): FrameDef => ({
     id, name,
     render: () => (
-      <div data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif", flexShrink:0 }}>
+        <div className="hmi-root" data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif", flexShrink:0 }}>
         {showTopBar && <HTopBar mode={mode} onBack={mode ? noop : undefined} soundOn={s?.soundOn??true} aimingLevel={(s?.aimingLevel??2) as 0|1|2|3|4|5} onMenu={mode ? noopMenu : undefined} activeMenu={activeMenu} cameraActive={cameraActive} onCamera={noop} onSound={noop} onAiming={noopAim} />}
         <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", position:"relative", minHeight:0 }}>
           <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
@@ -328,7 +328,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
     id: "LIVE",
     name: "현재 프로토타입",
     render: () => (
-      <div data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif", flexShrink:0 }}>
+        <div className="hmi-root" data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif", flexShrink:0 }}>
         {(liveScreen === "cos" || liveScreen === "frx") && (
           <HTopBar mode={liveScreen==="cos"?"cos":liveScreen==="frx"?"frx":null}
             onBack={liveScreen==="cos"||liveScreen==="frx" ? noop : undefined}
@@ -365,7 +365,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
       frames: [
         { id:"SCR-001", name:"Splash 0%",
           render: () => (
-            <div data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
+            <div className="hmi-root" data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
               <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", position:"relative", minHeight:0 }}>
                 <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
                   <HMI2Splash onDone={noop} forcedProgress={0} />
@@ -375,7 +375,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
           )},
         { id:"SCR-001A", name:"Splash 50%",
           render: () => (
-            <div data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
+            <div className="hmi-root" data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
               <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", position:"relative", minHeight:0 }}>
                 <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
                   <HMI2Splash onDone={noop} forcedProgress={50} />
@@ -385,7 +385,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
           )},
         { id:"SCR-001B", name:"Splash 100%",
           render: () => (
-            <div data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
+            <div className="hmi-root" data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
               <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", position:"relative", minHeight:0 }}>
                 <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
                   <HMI2Splash onDone={noop} forcedProgress={100} />
@@ -395,7 +395,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
           )},
         { id:"SCR-002", name:"Mode Select",
           render: () => (
-            <div data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
+            <div className="hmi-root" data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
               <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", position:"relative", minHeight:0 }}>
                 <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
                   <HMI2Home onCOS={noop} onFRX={noop} />
@@ -405,7 +405,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
           )},
         { id:"SCR-002A", name:"Mode Select COS Active",
           render: () => (
-            <div data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
+            <div className="hmi-root" data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
               <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", position:"relative", minHeight:0 }}>
                 <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
                   <HMI2Home onCOS={noop} onFRX={noop} forcedActive="cos" />
@@ -415,7 +415,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
           )},
         { id:"SCR-002B", name:"Mode Select FRX Active",
           render: () => (
-            <div data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
+            <div className="hmi-root" data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif" }}>
               <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", position:"relative", minHeight:0 }}>
                 <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
                   <HMI2Home onCOS={noop} onFRX={noop} forcedActive="frx" />
@@ -435,9 +435,6 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
         buildFrame("COS-005","Pulse Repeat",      "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Repeat" }),              true, true),
         buildFrame("COS-006","Pulse Stream",      "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Stream" }),              true, true),
         buildFrame("COS-007","Pulse Series",      "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Series" }),              true, true),
-        buildFrame("COS-008","Memo",              "cos", cos({}),                                                           true, true, <HMemoModal onClose={noop} />, undefined, "memo"),
-        buildFrame("COS-009","Call",              "cos", cos({}),                                                           true, true, <HCallModal s={cos({})} upd={noopUpd} onClose={noop} />, undefined, "call"),
-        buildFrame("COS-010","Save",              "cos", cos({}),                                                           true, true, <HSaveModal s={cos({})} onClose={noop} />, undefined, "save"),
         buildFrame("COS-011","Aiming OFF",        "cos", cos({ aimingLevel:0 as 0|1|2|3|4|5 }),                            true, true),
         buildFrame("COS-012","Aiming Level 1",    "cos", cos({ aimingLevel:1 as 0|1|2|3|4|5 }),                            true, true),
         buildFrame("COS-013","Aiming Level 2",    "cos", cos({ aimingLevel:2 as 0|1|2|3|4|5 }),                            true, true),
@@ -451,7 +448,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
         buildFrame("COS-021","Paused",            "cos", cos({ laserState:"paused" }),                                      true, true),
         buildFrame("COS-022","Parameter Duration", "cos", cos({}),                                                           true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="duration" />),
         buildFrame("COS-023","Parameter Interval", "cos", cos({}),                                                           true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="interval" />),
-        buildFrame("COS-024","Camera Preview",     "cos", cos({}),                                                           true, true, <HCameraModal />, undefined, null, true),
+        buildFrame("COS-025","Parameter Power Active", "cos", cos({}),                                                        true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="power" />),
       ],
     },
     {
@@ -465,9 +462,6 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
         buildFrame("FRX-006","Rim",               "frx", frx({ frxShape:"Rim" }),                                            true, true),
         buildFrame("FRX-007","Lining",            "frx", frx({ frxScanMode:"Lining" }),                                      true, true),
         buildFrame("FRX-008","Random",            "frx", frx({ frxScanMode:"Random" }),                                      true, true),
-        buildFrame("FRX-009","Memo",              "frx", frx({}),                                                            true, true, <HMemoModal onClose={noop} />, undefined, "memo"),
-        buildFrame("FRX-010","Call",              "frx", frx({}),                                                            true, true, <HCallModal s={frx({})} upd={noopUpd} onClose={noop} />, undefined, "call"),
-        buildFrame("FRX-011","Save",              "frx", frx({}),                                                            true, true, <HSaveModal s={frx({})} onClose={noop} />, undefined, "save"),
         buildFrame("FRX-012","Aiming OFF",        "frx", frx({ aimingLevel:0 as 0|1|2|3|4|5 }),                             true, true),
         buildFrame("FRX-013","Aiming Level 1",    "frx", frx({ aimingLevel:1 as 0|1|2|3|4|5 }),                             true, true),
         buildFrame("FRX-014","Aiming Level 2",    "frx", frx({ aimingLevel:2 as 0|1|2|3|4|5 }),                             true, true),
@@ -487,7 +481,21 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
         buildFrame("FRX-028","Width Minus Active", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxWidth-dec" />),
         buildFrame("FRX-029","Length Plus Active", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxLength-inc" />),
         buildFrame("FRX-030","Length Minus Active","frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxLength-dec" />),
-        buildFrame("FRX-031","Camera Preview",     "frx", frx({}),                                                            true, true, <HCameraModal />, undefined, null, true),
+        buildFrame("FRX-032","Parameter Power Active", "frx", frx({}),                                                        true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="power" />),
+      ],
+    },
+    {
+      section: "MODAL",
+      frames: [
+        buildFrame("MOD-001","COS Memo",            "cos", cos({}), true, true, <HMemoModal onClose={noop} />, undefined, "memo"),
+        buildFrame("MOD-002","COS Call",            "cos", cos({}), true, true, <HCallModal s={cos({})} upd={noopUpd} onClose={noop} />, undefined, "call"),
+        buildFrame("MOD-003","COS Save",            "cos", cos({}), true, true, <HSaveModal s={cos({})} onClose={noop} />, undefined, "save"),
+        buildFrame("MOD-004","COS Camera",          "cos", cos({}), true, true, <HCameraModal />, undefined, null, true),
+        buildFrame("MOD-005","Camera Keyboard Open","cos", cos({}), true, true, <HCameraModal forcedKeyboardOpen />, undefined, null, true),
+        buildFrame("MOD-006","FRX Memo",            "frx", frx({}), true, true, <HMemoModal onClose={noop} />, undefined, "memo"),
+        buildFrame("MOD-007","FRX Call",            "frx", frx({}), true, true, <HCallModal s={frx({})} upd={noopUpd} onClose={noop} />, undefined, "call"),
+        buildFrame("MOD-008","FRX Save",            "frx", frx({}), true, true, <HSaveModal s={frx({})} onClose={noop} />, undefined, "save"),
+        buildFrame("MOD-009","FRX Camera",          "frx", frx({}), true, true, <HCameraModal />, undefined, null, true),
       ],
     },
   ];

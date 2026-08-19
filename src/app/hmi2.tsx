@@ -2402,11 +2402,12 @@ export function HModal({
 // └─────────────────────────────────────────────────────────────────────────────┘
 export function HCameraModal({
                                  onClose = () => {
-                                 }
-                             }: { onClose?: () => void }) {
+                                 },
+                                 forcedKeyboardOpen = false
+                             }: { onClose?: () => void; forcedKeyboardOpen?: boolean }) {
     const guideColor = "rgba(0,202,228,0.42)";
     const guideSoft = "rgba(0,202,228,0.14)";
-    const [keyboardOpen, setKeyboardOpen] = useState(false);
+    const [keyboardOpen, setKeyboardOpen] = useState(forcedKeyboardOpen);
     const [keyboardLayout, setKeyboardLayout] = useState<"ko" | "en" | "symbol">("ko");
     const keyboardRows = keyboardLayout === "ko"
         ? [
