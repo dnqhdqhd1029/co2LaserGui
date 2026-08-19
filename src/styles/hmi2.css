@@ -106,7 +106,14 @@
     border: var(--hmi-selected-border-width) solid var(--hmi-border);
     border-radius: 18px;
     background-color: rgba(16, 27, 48, 0.96);
-    background-image: linear-gradient(180deg, rgba(255, 255, 255, 0.085) 0%, rgba(255, 255, 255, 0.045) 100%);
+    background-image: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.13) 0%,
+        rgba(255, 255, 255, 0.075) 18%,
+        rgba(255, 255, 255, 0.035) 55%,
+        rgba(0, 0, 0, 0.035) 78%,
+        rgba(0, 0, 0, 0.11) 100%
+    );
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.28), 0 8px 18px rgba(0, 0, 0, 0.22);
     transform: none;
     background-clip: padding-box;
@@ -144,6 +151,7 @@
 }
 
 .hmi-mode-select-card[data-highlighted="true"] {
+    border-width: 3px;
     border-color: color-mix(in srgb, var(--mode-accent) 50%, transparent);
     background-color: rgba(20, 35, 63, 0.98);
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.28), 0 8px 18px rgba(0, 0, 0, 0.26), 0 0 12px color-mix(in srgb, var(--mode-accent) 10%, transparent);
@@ -151,11 +159,25 @@
 }
 
 .hmi-mode-select-card[data-highlighted="true"][data-tone="cyan"] {
-    background-image: linear-gradient(180deg, rgba(0, 202, 228, 0.2) 0%, rgba(0, 202, 228, 0.08) 100%);
+    background-image: linear-gradient(
+        180deg,
+        rgba(87, 231, 244, 0.24) 0%,
+        rgba(0, 202, 228, 0.18) 24%,
+        rgba(0, 202, 228, 0.1) 58%,
+        rgba(0, 114, 137, 0.08) 80%,
+        rgba(0, 0, 0, 0.12) 100%
+    );
 }
 
 .hmi-mode-select-card[data-highlighted="true"][data-tone="blue"] {
-    background-image: linear-gradient(180deg, rgba(30, 126, 245, 0.2) 0%, rgba(30, 126, 245, 0.08) 100%);
+    background-image: linear-gradient(
+        180deg,
+        rgba(111, 173, 255, 0.25) 0%,
+        rgba(30, 126, 245, 0.18) 24%,
+        rgba(30, 126, 245, 0.1) 58%,
+        rgba(15, 67, 142, 0.08) 80%,
+        rgba(0, 0, 0, 0.12) 100%
+    );
 }
 
 .hmi-mode-select-card[data-pressed="true"] {
