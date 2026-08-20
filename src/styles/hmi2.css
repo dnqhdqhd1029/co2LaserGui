@@ -801,6 +801,48 @@
     gap: 6px;
 }
 
+.hmi-camera-keyboard--screen-overlay {
+    inset: 50% 0 0;
+    z-index: 20;
+    padding: 12px 24px 18px;
+    border: 0;
+    border-radius: 0;
+    gap: 7px;
+    box-sizing: border-box;
+}
+
+.hmi-camera-keyboard--screen-overlay .hmi-camera-keyboard__header {
+    height: 34px;
+    font-size: 15px;
+}
+
+.hmi-camera-keyboard--screen-overlay .hmi-camera-keyboard__close {
+    width: 34px;
+    height: 34px;
+}
+
+.hmi-camera-keyboard--screen-overlay .hmi-camera-keyboard__row {
+    flex: 1;
+    gap: 7px;
+}
+
+.hmi-camera-keyboard--screen-overlay .hmi-camera-keyboard__key {
+    flex: 1;
+    min-width: 0;
+    height: auto;
+    border-radius: 10px;
+    font-size: 18px;
+}
+
+.hmi-camera-keyboard--screen-overlay .hmi-camera-keyboard__key--wide {
+    flex: 1.35;
+}
+
+.hmi-camera-keyboard--screen-overlay .hmi-camera-keyboard__key--space {
+    flex: 4;
+    width: auto;
+}
+
 .hmi-camera-keyboard__header {
     height: 28px;
     display: flex;

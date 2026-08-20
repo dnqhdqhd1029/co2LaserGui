@@ -169,6 +169,7 @@ function HParamCol({
     emphasized?: boolean;
 }) {
     const [pressedControl, setPressedControl] = useState<"inc" | "dec" | null>(null);
+    const [integerPart, decimalPart] = String(value).split(".");
     return (
         <div
             style={{
@@ -224,8 +225,9 @@ function HParamCol({
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    gap: "2px",
-                    padding: emphasized ? "52px 0" : "18px 0"
+                    gap: "6px",
+                    padding: emphasized ? "52px 0" : "18px 0",
+                    marginLeft: "23px"
                 }}
             >
                 <div
@@ -233,6 +235,7 @@ function HParamCol({
                         display: "flex",
                         alignItems: "baseline",
                         gap: "6px"
+
                     }}
                 >
           <span
@@ -240,12 +243,20 @@ function HParamCol({
                   fontFamily: "'JetBrains Mono',monospace",
                   fontWeight: 500,
                   lineHeight: 1,
-                  letterSpacing: "-0.01em",
-                  fontSize: emphasized ? 72 : 32,
+                  letterSpacing: "-0.04em",
+                  fontSize: emphasized ? 92 : 32,
+                  //transform: emphasized ? "scale(1.18)" : "none",
+                  transformOrigin: "center",
                   color: locked ? "#253448" : H.text
               }}
           >
-            {value}
+            {integerPart}
+              {decimalPart !== undefined && (
+                  <>
+                      <span style={{margin: "0 -0.14em"}}>.</span>
+                      {decimalPart}
+                  </>
+              )}
           </span>
                     <span
                         style={{
@@ -289,7 +300,8 @@ function HParamCol({
                     transform: pressedControl === "dec" ? "translateY(1px)" : "none",
                     boxShadow: pressedControl === "dec"
                         ? "inset 0 2px 6px rgba(0,0,0,0.38)"
-                        : "inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 4px rgba(0,0,0,0.2)"
+                        : "inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 4px rgba(0,0,0,0.2)",
+
                 }}
             >
                 <span className="hmi-param-control__triangle" aria-hidden="true">
@@ -307,6 +319,224 @@ function HParamCol({
             {/*>*/}
             {/*  {label}*/}
             {/*</div>*/}
+        </div>
+    );
+}
+
+function HSizeParamCol({
+                           label,
+                           value,
+                           unit,
+                           onDec,
+                           onInc,
+                           locked,
+                           forcedPressed = null,
+                       }: {
+    label: string;
+    value: number;
+    unit: string;
+    onDec: () => void;
+    onInc: () => void;
+    locked: boolean;
+    forcedPressed?: "inc" | "dec" | null;
+}) {
+    const [pressedControl, setPressedControl] = useState<"inc" | "dec" | null>(forcedPressed);
+    const controlStyle = (direction: "inc" | "dec"): React.CSSProperties => ({
+        width: "100%",
+        height: direction === "inc" ? "50px" : "46px",
+        borderRadius: direction === "inc" ? "10px 10px 0 0" : "0 0 10px 10px",
+        border: "1px solid transparent",
+        borderBottom: direction === "inc" ? `1px solid ${H.border}` : undefined,
+        borderTop: direction === "dec" ? `1px solid ${H.border}` : undefined,
+        padding: "0",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "all 0.1s",
+        background: pressedControl === direction
+            ? "rgba(255,255,255,0.02)"
+            : locked
+                ? "rgba(255,255,255,0.02)"
+                : "linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.035) 100%)",
+        color: locked ? H.textDim : "#7a9bbf",
+        cursor: locked ? "default" : "pointer",
+        transform: pressedControl === direction ? "translateY(1px)" : "none",
+        boxShadow: pressedControl === direction
+            ? "inset 0 2px 6px rgba(0,0,0,0.38)"
+            : locked
+                ? "none"
+                : "inset 0 1px 0 rgba(255,255,255,0.07), 0 2px 4px rgba(0,0,0,0.2)"
+    });
+
+    const release = () => setPressedControl(null);
+    return (
+        <div style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "5px",
+            color: "#4e6e9a"
+        }}>
+            <span style={{
+                fontSize: "14px",
+                textTransform: "uppercase",
+                letterSpacing: "0.12em",
+                fontWeight: 600,
+                lineHeight: 1.2,
+                marginBottom: "8px"
+            }}>
+                {label}
+            </span>
+            <div style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                maxWidth: "132px",
+                gap: "0"
+            }}>
+                <button
+                    className="hmi-param-control hmi-param-control--inc"
+                    disabled={locked}
+                    onPointerDown={() => !locked && setPressedControl("inc")}
+                    onPointerUp={release}
+                    onPointerLeave={release}
+                    onPointerCancel={release}
+                    onClick={onInc}
+                    style={controlStyle("inc")}
+                >
+                    <span className="hmi-param-control__triangle" aria-hidden="true">
+                        <span className="hmi-param-control__symbol">+</span>
+                    </span>
+                </button>
+                <div style={{
+                    width: "100%",
+                    minHeight: "62px",
+                    display: "flex",
+                    alignItems: "baseline",
+                    justifyContent: "center",
+                    gap: "2px",
+                    textAlign: "center",
+                    background: "rgba(0,0,0,0.3)",
+                    padding: "14px 0",
+                    boxSizing: "border-box",
+                    color: "#d8e8ff",
+                    marginLeft: "23px"
+                }}>
+                    <span style={{
+                        fontFamily: "'JetBrains Mono',monospace",
+                        fontSize: "47px",
+                        fontWeight: 500,
+                        lineHeight: 1,
+                        color: "#fff"
+                    }}>{value}</span>
+                    <span style={{fontSize: "14px", lineHeight: 1}}>{unit}</span>
+                </div>
+                <button
+                    className="hmi-param-control hmi-param-control--dec"
+                    disabled={locked}
+                    onPointerDown={() => !locked && setPressedControl("dec")}
+                    onPointerUp={release}
+                    onPointerLeave={release}
+                    onPointerCancel={release}
+                    onClick={onDec}
+                    style={controlStyle("dec")}
+                >
+                    <span className="hmi-param-control__triangle" aria-hidden="true">
+                        <span className="hmi-param-control__symbol">−</span>
+                    </span>
+                </button>
+            </div>
+        </div>
+    );
+}
+
+function HSizeControlsSection({
+                                  width,
+                                  length,
+                                  disabled,
+                                  sizeLocked,
+                                  onToggleLock,
+                                  onWidthChange,
+                                  onLengthChange,
+                                  forcedSizeControl,
+                              }: {
+    width: number;
+    length: number;
+    disabled: boolean;
+    sizeLocked: boolean;
+    onToggleLock: () => void;
+    onWidthChange: (delta: number) => void;
+    onLengthChange: (delta: number) => void;
+    forcedSizeControl?: "frxWidth-inc" | "frxWidth-dec" | "frxLength-inc" | "frxLength-dec";
+}) {
+    const controls = [
+        {key: "frxWidth", label: "WIDTH", value: width, onChange: onWidthChange},
+        {key: "frxLength", label: "LENGTH", value: length, onChange: onLengthChange},
+    ] as const;
+
+    return (
+        <div style={{
+            padding: "14px 16px",
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: "10px"
+        }}>
+            <div style={{
+                width: "100%",
+                display: "grid",
+                gridTemplateColumns: "minmax(0, 1fr) 56px minmax(0, 1fr)",
+                alignItems: "center",
+                gap: "10px"
+            }}>
+                {controls.map((control, index) => (
+                    <React.Fragment key={control.key}>
+                        <HSizeParamCol
+                            label={control.label}
+                            value={control.value}
+                            unit="mm"
+                            locked={sizeLocked || disabled}
+                            forcedPressed={
+                                forcedSizeControl === `${control.key}-inc`
+                                    ? "inc"
+                                    : forcedSizeControl === `${control.key}-dec`
+                                        ? "dec"
+                                        : null
+                            }
+                            onInc={() => control.onChange(1)}
+                            onDec={() => control.onChange(-1)}
+                        />
+                        {index === 0 && (
+                            <button
+                                onClick={onToggleLock}
+                                aria-label={sizeLocked ? "Unlock width and length" : "Lock width and length"}
+                                aria-pressed={sizeLocked}
+                                title={sizeLocked ? "Unlock width and length" : "Lock width and length"}
+                                style={{
+                                    width: "56px", height: "56px", borderRadius: "12px", cursor: "pointer",
+                                    display: "flex", alignItems: "center", justifyContent: "center", padding: "0",
+                                    transition: "all 0.14s",
+                                    border: `var(--hmi-selected-border-width) solid ${sizeLocked ? H.blue : H.border}`,
+                                    background: sizeLocked ? H.blueDim : "rgba(255,255,255,0.03)",
+                                    color: sizeLocked ? H.blue : H.textSub,
+                                    marginTop: "33px"
+                                }}
+                            >
+                                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                     strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                                    <rect x="4" y="10" width="16" height="11" rx="2"/>
+                                    <path d={sizeLocked ? "M8 10V7a4 4 0 0 1 8 0v3" : "M8 10V7a4 4 0 0 1 7.4-2.1"}/>
+                                </svg>
+                            </button>
+                        )}
+                    </React.Fragment>
+                ))}
+            </div>
         </div>
     );
 }
@@ -1779,7 +2009,6 @@ export function HMI2FRX({
 }) {
     const locked = s.laserState === "lasering";
     const [sizeLocked, setSizeLocked] = useState(forcedSizeLocked ?? false);
-    const [pressedSizeControl, setPressedSizeControl] = useState<string | null>(forcedSizeControl ?? null);
     const [activeParam, setActiveParam] = useState<
         "power" | "degree" | "density" | "pause"
     >("power");
@@ -1825,7 +2054,7 @@ export function HMI2FRX({
                 x2="21"
                 y2="12"
                 stroke="currentColor"
-                strokeWidth={2.2}
+                strokeWidth={3}
                 strokeLinecap="round"
             />,
         ],
@@ -1834,7 +2063,7 @@ export function HMI2FRX({
             <polygon
                 points="12,3 21,21 3,21"
                 stroke="currentColor"
-                strokeWidth={2}
+                strokeWidth={3}
                 fill="none"
             />,
         ],
@@ -1847,7 +2076,7 @@ export function HMI2FRX({
                 height="18"
                 rx="2"
                 stroke="currentColor"
-                strokeWidth={2}
+                strokeWidth={3}
                 fill="none"
             />,
         ],
@@ -1858,7 +2087,7 @@ export function HMI2FRX({
                 cy="12"
                 r="9"
                 stroke="currentColor"
-                strokeWidth={2}
+                strokeWidth={3}
                 fill="none"
             />,
         ],
@@ -1870,7 +2099,7 @@ export function HMI2FRX({
                     cy="12"
                     r="9"
                     stroke="currentColor"
-                    strokeWidth={2}
+                    strokeWidth={3}
                     fill="none"
                 />
                 <circle
@@ -1878,7 +2107,7 @@ export function HMI2FRX({
                     cy="12"
                     r="4"
                     stroke="currentColor"
-                    strokeWidth={1.4}
+                    strokeWidth={2.5}
                     fill="none"
                 />
             </>,
@@ -2009,252 +2238,20 @@ export function HMI2FRX({
                         ))}
                     </div>
                 </div>
-                {/* WIDTH / LENGTH */}
-                <div
-                    style={{
-                        padding: "14px 16px",
-                        flex: 1,
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        gap: "10px"
-                    }}
-                >
-                    <div
-                        style={{
-                            width: "100%",
-                            display: "grid",
-                            gridTemplateColumns: "minmax(0, 1fr) 56px minmax(0, 1fr)",
-                            alignItems: "center",
-                            gap: "10px"
-                        }}
-                    >
-                        {(
-                            [
-                                ["frxWidth", "WIDTH", "mm", 5, 40, 1],
-                                ["frxLength", "LENGTH", "mm", 5, 40, 1],
-                            ] as const
-                        ).map(([key, lbl, unit, mn, mx, st], index) => (
-                            <React.Fragment key={key}>
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "center",
-                                        justifyContent: "center",
-                                        gap: "5px",
-                                        color: "#4e6e9a"
-                                    }}
-                                >
-              <span
-                  style={{
-                      fontSize: "14px",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.12em",
-                      fontWeight: 600,
-                      lineHeight: 1.2,
-                      marginBottom: "8px"
-                  }}
-              >
-                {lbl}
-              </span>
-                                    <div
-                                        style={{
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            width: "100%",
-                                            maxWidth: "132px",
-                                            gap: "0"
-                                        }}
-                                    >
-                                        <button
-                                            disabled={sizeLocked || locked}
-                                            onPointerDown={() =>
-                                                !sizeLocked && !locked && setPressedSizeControl(`${key}-inc`)
-                                            }
-                                            onPointerUp={() => setPressedSizeControl(null)}
-                                            onPointerLeave={() => setPressedSizeControl(null)}
-                                            onPointerCancel={() => setPressedSizeControl(null)}
-                                            onClick={() =>
-                                                upd({
-                                                    [key]: adjVal(
-                                                        s[key] as number,
-                                                        st,
-                                                        mn,
-                                                        mx,
-                                                        st,
-                                                    ),
-                                                })
-                                            }
-                                            style={{
-                                                width: "100%",
-                                                height: "50px",
-                                                borderRadius: "10px 10px 0 0",
-                                                border: "1px solid transparent",
-                                                fontSize: "24px",
-                                                fontWeight: 700,
-                                                lineHeight: 1,
-                                                padding: "0",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                transition: "all 0.1s",
-                                                borderBottom: `1px solid ${H.border}`,
-                                                background: pressedSizeControl === `${key}-inc`
-                                                    ? "rgba(255,255,255,0.02)"
-                                                    : sizeLocked || locked
-                                                        ? "rgba(255,255,255,0.02)"
-                                                        : "linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.035) 100%)",
-                                                color: pressedSizeControl === `${key}-inc`
-                                                    ? "#7a9bbf"
-                                                    : sizeLocked || locked ? H.textDim : "#7a9bbf",
-                                                cursor: sizeLocked || locked ? "default" : "pointer",
-                                                transform: pressedSizeControl === `${key}-inc` ? "translateY(1px)" : "none",
-                                                boxShadow: pressedSizeControl === `${key}-inc`
-                                                    ? "inset 0 2px 6px rgba(0,0,0,0.38)"
-                                                    : sizeLocked || locked
-                                                        ? "none"
-                                                        : "inset 0 1px 0 rgba(255,255,255,0.07), 0 2px 4px rgba(0,0,0,0.2)"
-                                            }}
-                                        >
-                                            +
-                                        </button>
-                                        <div
-                                            style={{
-                                                width: "100%",
-                                                minHeight: "62px",
-                                                display: "flex",
-                                                alignItems: "baseline",
-                                                justifyContent: "center",
-                                                gap: "2px",
-                                                textAlign: "center",
-                                                background: "rgba(0,0,0,0.3)",
-                                                padding: "14px 0",
-                                                boxSizing: "border-box",
-                                                color: "#d8e8ff"
-                                            }}
-                                        >
-                  <span
-                      style={{
-                          fontFamily: "'JetBrains Mono',monospace",
-                          fontSize: "32px",
-                          fontWeight: 500,
-                          lineHeight: 1,
-                          color: "#4e6e9a"
-                      }}
-                  >
-                    {s[key] as number}
-                  </span>
-                                            <span
-                                                style={{
-                                                    fontSize: "14px",
-                                                    lineHeight: 1
-                                                }}
-                                            >
-                    {unit}
-                  </span>
-                                        </div>
-                                        <button
-                                            disabled={sizeLocked || locked}
-                                            onPointerDown={() =>
-                                                !sizeLocked && !locked && setPressedSizeControl(`${key}-dec`)
-                                            }
-                                            onPointerUp={() => setPressedSizeControl(null)}
-                                            onPointerLeave={() => setPressedSizeControl(null)}
-                                            onPointerCancel={() => setPressedSizeControl(null)}
-                                            onClick={() =>
-                                                upd({
-                                                    [key]: adjVal(
-                                                        s[key] as number,
-                                                        -st,
-                                                        mn,
-                                                        mx,
-                                                        st,
-                                                    ),
-                                                })
-                                            }
-                                            style={{
-                                                width: "100%",
-                                                height: "46px",
-                                                borderRadius: "0 0 10px 10px",
-                                                border: "1px solid transparent",
-                                                fontSize: "24px",
-                                                fontWeight: 700,
-                                                lineHeight: 1,
-                                                padding: "0",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                transition: "all 0.1s",
-                                                borderTop: `1px solid ${H.border}`,
-                                                background: pressedSizeControl === `${key}-dec`
-                                                    ? "rgba(255,255,255,0.02)"
-                                                    : sizeLocked || locked
-                                                        ? "rgba(255,255,255,0.02)"
-                                                        : "linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.035) 100%)",
-                                                color: pressedSizeControl === `${key}-dec`
-                                                    ? "#7a9bbf"
-                                                    : sizeLocked || locked ? H.textDim : "#7a9bbf",
-                                                cursor: sizeLocked || locked ? "default" : "pointer",
-                                                transform: pressedSizeControl === `${key}-dec` ? "translateY(1px)" : "none",
-                                                boxShadow: pressedSizeControl === `${key}-dec`
-                                                    ? "inset 0 2px 6px rgba(0,0,0,0.38)"
-                                                    : sizeLocked || locked
-                                                        ? "none"
-                                                        : "inset 0 1px 0 rgba(255,255,255,0.07), 0 2px 4px rgba(0,0,0,0.2)"
-                                            }}
-                                        >
-                                            −
-                                        </button>
-                                    </div>
-                                </div>
-                                {index === 0 && (
-                                    <button
-                                        onClick={() => setSizeLocked((value) => !value)}
-                                        aria-label={sizeLocked ? "Unlock width and length" : "Lock width and length"}
-                                        aria-pressed={sizeLocked}
-                                        title={sizeLocked ? "Unlock width and length" : "Lock width and length"}
-                                        style={{
-                                            width: "56px",
-                                            height: "56px",
-                                            borderRadius: "12px",
-                                            cursor: "pointer",
-                                            display: "flex",
-                                            alignItems: "center",
-                                            justifyContent: "center",
-                                            padding: "0",
-                                            transition: "all 0.14s",
-                                            border: `var(--hmi-selected-border-width) solid ${sizeLocked ? H.blue : H.border}`,
-                                            background: sizeLocked ? H.blueDim : "rgba(255,255,255,0.03)",
-                                            color: sizeLocked ? H.blue : H.textSub,
-                                            marginTop: "33px"
-
-                                        }}
-                                    >
-                                        <svg
-                                            width="26"
-                                            height="26"
-                                            viewBox="0 0 24 24"
-                                            fill="none"
-                                            stroke="currentColor"
-                                            strokeWidth="2"
-                                            strokeLinecap="round"
-                                            strokeLinejoin="round"
-                                            aria-hidden="true"
-                                        >
-                                            <rect x="4" y="10" width="16" height="11" rx="2"/>
-                                            <path
-                                                d={sizeLocked ? "M8 10V7a4 4 0 0 1 8 0v3" : "M8 10V7a4 4 0 0 1 7.4-2.1"}/>
-                                        </svg>
-                                    </button>
-                                )}
-                            </React.Fragment>
-                        ))}
-                    </div>
-                </div>
+                <HSizeControlsSection
+                    width={s.frxWidth}
+                    length={s.frxLength}
+                    disabled={locked}
+                    sizeLocked={sizeLocked}
+                    onToggleLock={() => setSizeLocked((value) => !value)}
+                    forcedSizeControl={forcedSizeControl}
+                    onWidthChange={(delta) =>
+                        upd({frxWidth: adjVal(s.frxWidth, delta, 5, 40, 1)})
+                    }
+                    onLengthChange={(delta) =>
+                        upd({frxLength: adjVal(s.frxLength, delta, 5, 40, 1)})
+                    }
+                />
             </div>
             {/* RIGHT: parameters */}
             <div
@@ -2348,6 +2345,8 @@ export function HModal({
                            onClose,
                            headerAction,
                            bodyClassName,
+                           modalClassName,
+                           overlayContent,
                            children,
                        }: {
     title?: string;
@@ -2355,6 +2354,8 @@ export function HModal({
     onClose: () => void;
     headerAction?: React.ReactNode;
     bodyClassName?: string;
+    modalClassName?: string;
+    overlayContent?: React.ReactNode;
     children: React.ReactNode;
 }) {
     return (
@@ -2364,7 +2365,7 @@ export function HModal({
                 animate={{opacity: 1, scale: 1, y: 0}}
                 exit={{opacity: 0, scale: 0.96, y: 10}}
                 transition={{duration: 0.18}}
-                className="hmi-modal"
+                className={`hmi-modal${modalClassName ? ` ${modalClassName}` : ""}`}
             >
                 <div className="hmi-modal__header">
                     {badge && (
@@ -2390,6 +2391,7 @@ export function HModal({
                     {children}
                 </div>
             </motion.div>
+            {overlayContent}
         </div>
     );
 }
@@ -2432,6 +2434,29 @@ export function HCameraModal({
             badge="CAMERA"
             onClose={onClose}
             bodyClassName="hmi-modal__body--camera"
+            overlayContent={keyboardOpen ? (
+                <div className="hmi-camera-keyboard hmi-camera-keyboard--screen-overlay">
+                    <div className="hmi-camera-keyboard__header">
+                        <span>KEYBOARD</span>
+                        <button className="hmi-camera-keyboard__close" onClick={() => setKeyboardOpen(false)} aria-label="키보드 닫기">
+                            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M5 5L19 19M19 5L5 19"/>
+                            </svg>
+                        </button>
+                    </div>
+                    {keyboardRows.map((row, rowIndex) => (
+                        <div className="hmi-camera-keyboard__row" key={rowIndex}>
+                            {row.map((key) => <button className="hmi-camera-keyboard__key" key={key}>{key}</button>)}
+                        </div>
+                    ))}
+                    <div className="hmi-camera-keyboard__row">
+                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide" onClick={() => setKeyboardLayout((layout) => layout === "ko" ? "en" : "ko")}>한/영</button>
+                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide" onClick={() => setKeyboardLayout((layout) => layout === "symbol" ? "ko" : "symbol")}>{keyboardLayout === "symbol" ? "가나다" : "!#1"}</button>
+                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--space">SPACE</button>
+                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide">⌫</button>
+                    </div>
+                </div>
+            ) : undefined}
             headerAction={(
                 <button
                     className="hmi-modal__keyboard-toggle"
@@ -2484,45 +2509,6 @@ export function HCameraModal({
                     ))}
                 </div>
             </div>
-            {keyboardOpen && (
-                <div className="hmi-camera-keyboard">
-                    <div className="hmi-camera-keyboard__header">
-                        <span>KEYBOARD</span>
-                        <button
-                            className="hmi-camera-keyboard__close"
-                            onClick={() => setKeyboardOpen(false)}
-                            aria-label="키보드 닫기"
-                        >
-                            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-                                <path d="M5 5L19 19M19 5L5 19"/>
-                            </svg>
-                        </button>
-                    </div>
-                    {keyboardRows.map((row, rowIndex) => (
-                        <div className="hmi-camera-keyboard__row" key={rowIndex}>
-                            {row.map((key) => (
-                                <button className="hmi-camera-keyboard__key" key={key}>{key}</button>
-                            ))}
-                        </div>
-                    ))}
-                    <div className="hmi-camera-keyboard__row">
-                        <button
-                            className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide"
-                            onClick={() => setKeyboardLayout((layout) => layout === "ko" ? "en" : "ko")}
-                        >
-                            한/영
-                        </button>
-                        <button
-                            className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide"
-                            onClick={() => setKeyboardLayout((layout) => layout === "symbol" ? "ko" : "symbol")}
-                        >
-                            {keyboardLayout === "symbol" ? "가나다" : "!#1"}
-                        </button>
-                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--space">SPACE</button>
-                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide">⌫</button>
-                    </div>
-                </div>
-            )}
         </HModal>
     );
 }
