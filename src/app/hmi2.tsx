@@ -19,7 +19,7 @@ export interface HMIState2 {
     co2PulseMode: "Single" | "Repeat" | "Stream" | "Series";
     co2Tab: "Normal" | "Fractional";
     // FRX params
-    frxPower: number;
+    frxIntensity: number;
     frxDuration: number;
     frxDegree: number;
     frxDensity: number;
@@ -42,7 +42,7 @@ export const HMI2_DEFAULT: HMIState2 = {
     co2LaserMode: "Pulse",
     co2PulseMode: "Repeat",
     co2Tab: "Normal",
-    frxPower: 20,
+    frxIntensity: 20,
     frxDuration: 0.5,
     frxDegree: 1,
     frxDensity: 0.5,
@@ -177,7 +177,7 @@ function HParamCol({
                 flexDirection: "column",
                 alignItems: "center",
                 gap: "0",
-                minWidth: emphasized ? 288 : 136
+                minWidth: emphasized ? 288 : 136,
             }}
         >
             <button
@@ -240,10 +240,9 @@ function HParamCol({
                 >
           <span
               style={{
-                  fontFamily: "'JetBrains Mono',monospace",
+                  fontFamily: "'Inter', sans-serif",
                   fontWeight: 500,
                   lineHeight: 1,
-                  letterSpacing: "-0.04em",
                   fontSize: emphasized ? 92 : 32,
                   //transform: emphasized ? "scale(1.18)" : "none",
                   transformOrigin: "center",
@@ -253,7 +252,7 @@ function HParamCol({
             {integerPart}
               {decimalPart !== undefined && (
                   <>
-                      <span style={{margin: "0 -0.14em"}}>.</span>
+                      <span>.</span>
                       {decimalPart}
                   </>
               )}
@@ -763,7 +762,7 @@ export function HTopBar({
                             padding: "3px 10px",
                             borderRadius: "6px",
                             fontWeight: 700,
-                            letterSpacing: "0.05em",
+                            letterSpacing: "0.02em",
                             background:
                                 mode === "cos" ? H.cyanDim : H.blueDim,
                             border: `var(--hmi-selected-border-width) solid ${mode === "cos" ? H.cyan : H.blue}40`,
@@ -1664,6 +1663,20 @@ export function HMI2COS({
             onDec: () => upd({co2Interval: adjVal(s.co2Interval, -1, 1, 100, 1)}),
             onInc: () => upd({co2Interval: adjVal(s.co2Interval, 1, 1, 100, 1)}),
         },
+        onTime: {
+            label: "On Time",
+            value: s.co2Interval,
+            unit: "ms",
+            onDec: () => upd({co2Interval: adjVal(s.co2Interval, -1, 1, 100, 1)}),
+            onInc: () => upd({co2Interval: adjVal(s.co2Interval, 1, 1, 100, 1)}),
+        },
+        offTime: {
+            label: "Off Time",
+            value: s.co2Interval,
+            unit: "ms",
+            onDec: () => upd({co2Interval: adjVal(s.co2Interval, -1, 1, 100, 1)}),
+            onInc: () => upd({co2Interval: adjVal(s.co2Interval, 1, 1, 100, 1)}),
+        },
     };
     const selectedCosParamKey = forcedParam ?? activeCosParam;
     const selectedCosParam = cosParams[selectedCosParamKey];
@@ -1867,7 +1880,7 @@ export function HMI2COS({
                         style={{
                             display: "grid",
                             gridTemplateColumns: "1fr 1fr",
-                            gridTemplateRows: "1fr 1fr",
+                            //gridTemplateRows: "1fr 1fr",
                             gap: "18px",
                             flex: 1,
                             minHeight: "0",
@@ -1875,7 +1888,12 @@ export function HMI2COS({
                         }}
                     >
                         {(
-                            ["Single", "Repeat", "Stream", "Series"] as const
+                            [
+                                "Single",
+                                "Repeat",
+                                // "Stream",
+                                // "Series",
+                            ] as const
                         ).map((m) => (
                             <HModeBtn
                                 key={m}
@@ -1915,7 +1933,7 @@ export function HMI2COS({
                         style={{
                             width: "100%",
                             display: "grid",
-                            gridTemplateColumns: "repeat(3, 1fr)",
+                            gridTemplateColumns: `repeat(${Object.keys(cosParams).length}, minmax(0, 1fr))`,
                             gap: "12px"
                         }}
                     >
@@ -1926,11 +1944,14 @@ export function HMI2COS({
                                     key={key}
                                     onClick={() => setActiveCosParam(key)}
                                     style={{
+                                        width: "100%",
+                                        minWidth: 0,
+                                        boxSizing: "border-box",
                                         height: "88px",
                                         borderRadius: "10px",
-                                        fontSize: "22px",
+                                        fontSize: "18px",
                                         lineHeight: 1.25,
-                                        letterSpacing: "0.05em",
+                                        letterSpacing: "0.01em",
                                         cursor: "pointer",
                                         transition: "all 0.14s",
                                         border: `var(--hmi-selected-border-width) solid ${active ? H.cyan : H.border}`,
@@ -1958,7 +1979,8 @@ export function HMI2COS({
                             justifyContent: "center",
                             borderRadius: "16px",
                             background: "rgba(0,0,0,0.12)",
-                            border: `1px solid ${H.border}`
+                            border: `1px solid ${H.border}`,
+                            padding: "16px"
                         }}
                     >
                         <HParamCol
@@ -2003,22 +2025,22 @@ export function HMI2FRX({
     s: HMIState2;
     upd: (p: Partial<HMIState2>) => void;
     onMenu: (k: "memo" | "call" | "save") => void;
-    forcedParam?: "power" | "degree" | "density" | "pause";
+    forcedParam?: "intensity" | "degree" | "density" | "pause";
     forcedSizeLocked?: boolean;
     forcedSizeControl?: "frxWidth-inc" | "frxWidth-dec" | "frxLength-inc" | "frxLength-dec";
 }) {
     const locked = s.laserState === "lasering";
     const [sizeLocked, setSizeLocked] = useState(forcedSizeLocked ?? false);
     const [activeParam, setActiveParam] = useState<
-        "power" | "degree" | "density" | "pause"
-    >("power");
+        "intensity" | "degree" | "density" | "pause"
+    >("intensity");
     const frxParams = {
-        power: {
-            label: "Power",
-            value: s.frxPower,
-            unit: "W",
-            onDec: () => upd({frxPower: adjVal(s.frxPower, -1, 1, 60, 1)}),
-            onInc: () => upd({frxPower: adjVal(s.frxPower, 1, 1, 60, 1)}),
+        intensity: {
+            label: "Intensity",
+            value: s.frxIntensity,
+            unit: "",
+            onDec: () => upd({frxIntensity: adjVal(s.frxIntensity, -1, 1, 60, 1)}),
+            onInc: () => upd({frxIntensity: adjVal(s.frxIntensity, 1, 1, 60, 1)}),
         },
         degree: {
             label: "Degree",
@@ -2276,7 +2298,7 @@ export function HMI2FRX({
                         style={{
                             width: "100%",
                             display: "grid",
-                            gridTemplateColumns: "repeat(4, 1fr)",
+                            gridTemplateColumns: `repeat(${Object.keys(frxParams).length}, 1fr)`,
                             gap: "12px"
                         }}
                     >
@@ -2319,7 +2341,8 @@ export function HMI2FRX({
                             justifyContent: "center",
                             borderRadius: "16px",
                             background: "rgba(0,0,0,0.12)",
-                            border: `1px solid ${H.border}`
+                            border: `1px solid ${H.border}`,
+                            padding: "16px"
                         }}
                     >
                         <HParamCol
@@ -2438,7 +2461,8 @@ export function HCameraModal({
                 <div className="hmi-camera-keyboard hmi-camera-keyboard--screen-overlay">
                     <div className="hmi-camera-keyboard__header">
                         <span>KEYBOARD</span>
-                        <button className="hmi-camera-keyboard__close" onClick={() => setKeyboardOpen(false)} aria-label="키보드 닫기">
+                        <button className="hmi-camera-keyboard__close" onClick={() => setKeyboardOpen(false)}
+                                aria-label="키보드 닫기">
                             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M5 5L19 19M19 5L5 19"/>
                             </svg>
@@ -2450,8 +2474,11 @@ export function HCameraModal({
                         </div>
                     ))}
                     <div className="hmi-camera-keyboard__row">
-                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide" onClick={() => setKeyboardLayout((layout) => layout === "ko" ? "en" : "ko")}>한/영</button>
-                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide" onClick={() => setKeyboardLayout((layout) => layout === "symbol" ? "ko" : "symbol")}>{keyboardLayout === "symbol" ? "가나다" : "!#1"}</button>
+                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide"
+                                onClick={() => setKeyboardLayout((layout) => layout === "ko" ? "en" : "ko")}>한/영
+                        </button>
+                        <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide"
+                                onClick={() => setKeyboardLayout((layout) => layout === "symbol" ? "ko" : "symbol")}>{keyboardLayout === "symbol" ? "가나다" : "!#1"}</button>
                         <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--space">SPACE</button>
                         <button className="hmi-camera-keyboard__key hmi-camera-keyboard__key--wide">⌫</button>
                     </div>
@@ -2625,7 +2652,7 @@ export const HPRESETS = [
         power: 20,
         duration: 0.3,
         interval: 6,
-        frxPower: 15,
+        frxIntensity: 15,
         frxDuration: 0.3,
     },
     {
@@ -2635,7 +2662,7 @@ export const HPRESETS = [
         power: 30,
         duration: 0.7,
         interval: 9,
-        frxPower: 20,
+        frxIntensity: 20,
         frxDuration: 0.5,
     },
     {
@@ -2645,7 +2672,7 @@ export const HPRESETS = [
         power: 45,
         duration: 1.0,
         interval: 12,
-        frxPower: 35,
+        frxIntensity: 35,
         frxDuration: 0.8,
     },
     {
@@ -2655,7 +2682,7 @@ export const HPRESETS = [
         power: 15,
         duration: 0.2,
         interval: 5,
-        frxPower: 10,
+        frxIntensity: 10,
         frxDuration: 0.2,
     },
     {
@@ -2665,7 +2692,7 @@ export const HPRESETS = [
         power: 50,
         duration: 1.2,
         interval: 15,
-        frxPower: 40,
+        frxIntensity: 40,
         frxDuration: 1.0,
     },
 ];
@@ -2751,7 +2778,9 @@ export function HCallModal({
                                     lineHeight: 1.8,
                                 }}
                             >
-                                <div>{isCOS ? p.power : p.frxPower} W</div>
+                                <div>
+                                    {isCOS ? `${p.power} W` : p.frxIntensity}
+                                </div>
                                 <div>
                                     {isCOS ? p.duration : p.frxDuration} ms
                                 </div>
@@ -2772,7 +2801,7 @@ export function HCallModal({
                         });
                     else
                         upd({
-                            frxPower: p.frxPower,
+                            frxIntensity: p.frxIntensity,
                             frxDuration: p.frxDuration,
                         });
                     onClose();
@@ -2820,7 +2849,7 @@ export function HSaveModal({
             ["Interval", `${s.co2Interval} ms`],
         ]
         : [
-            ["Power", `${s.frxPower} W`],
+            ["Intensity", `${s.frxIntensity}`],
             ["Duration", `${s.frxDuration.toFixed(1)} ms`],
             ["Degree", `${s.frxDegree}`],
             ["Density", `${s.frxDensity.toFixed(1)} mm`],

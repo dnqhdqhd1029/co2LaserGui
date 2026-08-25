@@ -45,7 +45,8 @@
     width: 200%;
     height: 200%;
     pointer-events: none;
-    opacity: 0.12;
+    opacity: 0.4;
+    border: 1px solid red;
     background: radial-gradient(
             circle at 50% 48%,
             rgba(174, 205, 235, 0.9) 0%,
@@ -349,6 +350,11 @@
 .hmi-shape-mode-btn__icon svg {
     width: 30px;
     height: 30px;
+    transition: transform var(--hmi-control-transition);
+}
+
+.hmi-shape-mode-btn[data-active="true"] .hmi-shape-mode-btn__icon svg {
+    transform: scale(1.1);
 }
 
 .hmi-shape-mode-btn__label {
@@ -395,7 +401,7 @@
 }
 
 .hmi-scan-mode-btn[data-active="true"] .hmi-scan-mode-btn__icon {
-    transform: scale(1.4) !important;
+    transform: scale(1.5) !important;
 }
 
 .hmi-mode-btn__label {
@@ -454,7 +460,7 @@
 
 /* Bottom laser state action */
 .hmi-laser-bar {
-    height: 90px;
+    height: 100px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -465,7 +471,7 @@
 
 .hmi-laser-bar__button {
     width: 380px;
-    height: 58px;
+    height: 68px;
     border: 2px solid;
     border-radius: 14px;
     cursor: pointer;
