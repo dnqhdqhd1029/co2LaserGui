@@ -2313,7 +2313,7 @@ export function HMI2FRX({
                                         borderRadius: "10px",
                                         fontSize: "22px",
                                         lineHeight: 1.25,
-                                        letterSpacing: "0.05em",
+                                        letterSpacing: "0.01em",
                                         cursor: "pointer",
                                         transition: "all 0.14s",
                                         border: `var(--hmi-selected-border-width) solid ${active ? H.blue : H.border}`,
