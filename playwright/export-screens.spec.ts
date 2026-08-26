@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 import { mkdir, readdir, unlink } from "node:fs/promises";
 import path from "node:path";
 
-const EXPORT_DIR = path.resolve(process.cwd(), "exports");
+const EXPORT_DIR = path.resolve(process.cwd(), process.env.EXPORT_DIR?.trim() || "exports/png");
 const TARGET_FRAME_ID = process.env.EXPORT_FRAME_ID?.trim();
 
 function safeFilename(value: string) {
@@ -14,13 +14,15 @@ function safeFilename(value: string) {
 
 test("export every HMI screen state as a 1024x768 PNG", async ({ page }) => {
   await mkdir(EXPORT_DIR, { recursive: true });
-  const previousFiles = await readdir(EXPORT_DIR);
-  await Promise.all(
-    previousFiles
-      .filter((filename) => filename.toLowerCase().endsWith(".png"))
-      .map((filename) => unlink(path.join(EXPORT_DIR, filename))),
-  );
-  await page.goto("/", { waitUntil: "networkidle" });
+  if (!TARGET_FRAME_ID) {
+    const previousFiles = await readdir(EXPORT_DIR);
+    await Promise.all(
+      previousFiles
+        .filter((filename) => filename.toLowerCase().endsWith(".png"))
+        .map((filename) => unlink(path.join(EXPORT_DIR, filename))),
+    );
+  }
+  await page.goto("/?embeddedExport=1", { waitUntil: "networkidle" });
 
   await page.locator('[data-section-id="07"]').click();
   await page.locator('[data-frame-id="SCR-001"]').waitFor();

@@ -1,0 +1,18 @@
+JetBrains Mono 폰트 사용 안내
+
+- 폰트명: JetBrains Mono
+- 라이선스: SIL Open Font License 1.1 (OFL 1.1)
+- 상업용 및 비상업용으로 무료 사용 가능
+- 웹사이트, 애플리케이션, 의료기기 UI, 인쇄물 등에 사용 가능
+- JetBrains 출처 표기는 필수가 아님
+- 폰트 파일 자체를 단독으로 판매하는 것은 제한됨
+
+HParamCol 적용 스타일
+
+- font-family: 'JetBrains Mono', monospace
+- letter-spacing: -0.04em
+- 소수점 간격: margin 0 -0.14em
+
+공식 안내:
+https://www.jetbrains.com/lp/mono/
+https://github.com/JetBrains/JetBrainsMono

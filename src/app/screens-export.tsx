@@ -167,6 +167,15 @@ function SectionHeader({ title, count }: { title: string; count: number }) {
 export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HMIState2 }) {
   const cos = (patch: Partial<HMIState2>): HMIState2 => ({ ...COS_BASE, ...patch });
   const frx = (patch: Partial<HMIState2>): HMIState2 => ({ ...FRX_BASE, ...patch });
+  // Neutral export states intentionally use a value outside the runtime enum,
+  // causing every button in that selection group to render inactive.
+  const noLaserMode = "__none__" as HMIState2["co2LaserMode"];
+  const noPulseMode = "__none__" as HMIState2["co2PulseMode"];
+  const noFrxShape = "__none__" as HMIState2["frxShape"];
+  const noFrxScanMode = "__none__" as HMIState2["frxScanMode"];
+  // Export frames are design assets: dynamic numeric values must remain blank
+  // so the value layer can be supplied separately after extraction.
+  const hideExportValues = true;
   // This ref points to the preview mount only. The actual screen frame is its
   // single, top-level child returned by FrameDef.render().
   const previewMountRef = useRef<HTMLDivElement>(null);
@@ -309,9 +318,9 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
           <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
             {children ?? (
               s?.screen==="cos"
-                ? <HMI2COS s={s} upd={noopUpd} onMenu={noopMenu} />
+                ? <HMI2COS s={s} upd={noopUpd} onMenu={noopMenu} hideDynamicValues={hideExportValues} />
                 : s?.screen==="frx"
-                ? <HMI2FRX s={s} upd={noopUpd} onMenu={noopMenu} />
+                ? <HMI2FRX s={s} upd={noopUpd} onMenu={noopMenu} hideDynamicValues={hideExportValues} />
                 : null
             )}
           </div>
@@ -428,9 +437,13 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
     {
       section: "COS",
       frames: [
-        buildFrame("COS-001","Default",           "cos", cos({}),                                                           true, true),
-        buildFrame("COS-002","CW",                "cos", cos({ co2LaserMode:"CW" }),                                        true, true),
-        buildFrame("COS-003","Pulse",             "cos", cos({ co2LaserMode:"Pulse" }),                                     true, true),
+        buildFrame("COS-001","No Selection",      "cos", cos({ co2LaserMode:noLaserMode, co2PulseMode:noPulseMode }),          true, true),
+        buildFrame("COS-002","CW Only",           "cos", cos({ co2LaserMode:"CW", co2PulseMode:noPulseMode }),                true, true),
+        buildFrame("COS-003","Pulse Only",        "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:noPulseMode }),             true, true),
+        buildFrame("COS-026","Pulse Mode Only · Single", "cos", cos({ co2LaserMode:noLaserMode, co2PulseMode:"Single" }),      true, true),
+        buildFrame("COS-027","Pulse Mode Only · Repeat", "cos", cos({ co2LaserMode:noLaserMode, co2PulseMode:"Repeat" }),      true, true),
+        buildFrame("COS-028","Pulse Mode Only · Stream", "cos", cos({ co2LaserMode:noLaserMode, co2PulseMode:"Stream" }),      true, true),
+        buildFrame("COS-029","Pulse Mode Only · Series", "cos", cos({ co2LaserMode:noLaserMode, co2PulseMode:"Series" }),      true, true),
         buildFrame("COS-004","Pulse Single",      "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Single" }),              true, true),
         buildFrame("COS-005","Pulse Repeat",      "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Repeat" }),              true, true),
         buildFrame("COS-006","Pulse Stream",      "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Stream" }),              true, true),
@@ -446,22 +459,35 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
         buildFrame("COS-019","Ready",             "cos", cos({ laserState:"ready" }),                                       true, true),
         buildFrame("COS-020","Laser Emission",    "cos", cos({ laserState:"lasering" }),                                    true, true),
         buildFrame("COS-021","Paused",            "cos", cos({ laserState:"paused" }),                                      true, true),
-        buildFrame("COS-022","Parameter Duration", "cos", cos({}),                                                           true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="duration" />),
-        buildFrame("COS-023","Parameter Interval", "cos", cos({}),                                                           true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="interval" />),
-        buildFrame("COS-025","Parameter Power Active", "cos", cos({}),                                                        true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="power" />),
+        buildFrame("COS-030","Parameter No Selection", "cos", cos({}),                                                        true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="none" hideDynamicValues />),
+        buildFrame("COS-025","Parameter Power Active", "cos", cos({}),                                                        true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="power" hideDynamicValues />),
+        buildFrame("COS-022","Parameter Duration", "cos", cos({}),                                                           true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="duration" hideDynamicValues />),
+        buildFrame("COS-023","Parameter Interval", "cos", cos({}),                                                           true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="interval" hideDynamicValues />),
+        buildFrame("COS-031","Parameter On Time",  "cos", cos({}),                                                           true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="onTime" hideDynamicValues />),
+        buildFrame("COS-032","Parameter Off Time", "cos", cos({}),                                                           true, true, undefined, <HMI2COS s={cos({})} upd={noopUpd} onMenu={noopMenu} forcedParam="offTime" hideDynamicValues />),
       ],
     },
     {
       section: "FRX",
       frames: [
-        buildFrame("FRX-001","Default",           "frx", frx({}),                                                           true, true),
-        buildFrame("FRX-002","Line",              "frx", frx({ frxShape:"Line" }),                                           true, true),
-        buildFrame("FRX-003","Triangle",          "frx", frx({ frxShape:"Triangle" }),                                       true, true),
-        buildFrame("FRX-004","Square",            "frx", frx({ frxShape:"Square" }),                                         true, true),
-        buildFrame("FRX-005","Oval",              "frx", frx({ frxShape:"Oval" }),                                           true, true),
-        buildFrame("FRX-006","Rim",               "frx", frx({ frxShape:"Rim" }),                                            true, true),
-        buildFrame("FRX-007","Lining",            "frx", frx({ frxScanMode:"Lining" }),                                      true, true),
-        buildFrame("FRX-008","Random",            "frx", frx({ frxScanMode:"Random" }),                                      true, true),
+        buildFrame("FRX-001","No Selection",      "frx", frx({ frxShape:noFrxShape, frxScanMode:noFrxScanMode }),             true, true),
+        buildFrame("FRX-036","Shape Only · Line",     "frx", frx({ frxShape:"Line",     frxScanMode:noFrxScanMode }),          true, true),
+        buildFrame("FRX-037","Shape Only · Triangle", "frx", frx({ frxShape:"Triangle", frxScanMode:noFrxScanMode }),          true, true),
+        buildFrame("FRX-038","Shape Only · Square",   "frx", frx({ frxShape:"Square",   frxScanMode:noFrxScanMode }),          true, true),
+        buildFrame("FRX-039","Shape Only · Oval",     "frx", frx({ frxShape:"Oval",     frxScanMode:noFrxScanMode }),          true, true),
+        buildFrame("FRX-040","Shape Only · Rim",      "frx", frx({ frxShape:"Rim",      frxScanMode:noFrxScanMode }),          true, true),
+        buildFrame("FRX-041","Scan Only · Lining",    "frx", frx({ frxShape:noFrxShape, frxScanMode:"Lining" }),               true, true),
+        buildFrame("FRX-042","Scan Only · Random",    "frx", frx({ frxShape:noFrxShape, frxScanMode:"Random" }),               true, true),
+        buildFrame("FRX-002","Lining · Line",     "frx", frx({ frxShape:"Line",     frxScanMode:"Lining" }),                    true, true),
+        buildFrame("FRX-003","Lining · Triangle", "frx", frx({ frxShape:"Triangle", frxScanMode:"Lining" }),                    true, true),
+        buildFrame("FRX-004","Lining · Square",   "frx", frx({ frxShape:"Square",   frxScanMode:"Lining" }),                    true, true),
+        buildFrame("FRX-005","Lining · Oval",     "frx", frx({ frxShape:"Oval",     frxScanMode:"Lining" }),                    true, true),
+        buildFrame("FRX-006","Lining · Rim",      "frx", frx({ frxShape:"Rim",      frxScanMode:"Lining" }),                    true, true),
+        buildFrame("FRX-007","Random · Line",     "frx", frx({ frxShape:"Line",     frxScanMode:"Random" }),                    true, true),
+        buildFrame("FRX-008","Random · Triangle", "frx", frx({ frxShape:"Triangle", frxScanMode:"Random" }),                    true, true),
+        buildFrame("FRX-033","Random · Square",   "frx", frx({ frxShape:"Square",   frxScanMode:"Random" }),                    true, true),
+        buildFrame("FRX-034","Random · Oval",     "frx", frx({ frxShape:"Oval",     frxScanMode:"Random" }),                    true, true),
+        buildFrame("FRX-035","Random · Rim",      "frx", frx({ frxShape:"Rim",      frxScanMode:"Random" }),                    true, true),
         buildFrame("FRX-012","Aiming OFF",        "frx", frx({ aimingLevel:0 as 0|1|2|3|4|5 }),                             true, true),
         buildFrame("FRX-013","Aiming Level 1",    "frx", frx({ aimingLevel:1 as 0|1|2|3|4|5 }),                             true, true),
         buildFrame("FRX-014","Aiming Level 2",    "frx", frx({ aimingLevel:2 as 0|1|2|3|4|5 }),                             true, true),
@@ -473,15 +499,16 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
         buildFrame("FRX-020","Ready",             "frx", frx({ laserState:"ready" }),                                        true, true),
         buildFrame("FRX-021","Laser Emission",    "frx", frx({ laserState:"lasering" }),                                     true, true),
         buildFrame("FRX-022","Paused",            "frx", frx({ laserState:"paused" }),                                       true, true),
-        buildFrame("FRX-023","Parameter Degree",  "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="degree" />),
-        buildFrame("FRX-024","Parameter Density", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="density" />),
-        buildFrame("FRX-025","Parameter Pause",   "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="pause" />),
-        buildFrame("FRX-026","Size Lock Active",   "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeLocked />),
-        buildFrame("FRX-027","Width Plus Active",  "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxWidth-inc" />),
-        buildFrame("FRX-028","Width Minus Active", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxWidth-dec" />),
-        buildFrame("FRX-029","Length Plus Active", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxLength-inc" />),
-        buildFrame("FRX-030","Length Minus Active","frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxLength-dec" />),
-        buildFrame("FRX-032","Parameter Power Active", "frx", frx({}),                                                        true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="power" />),
+        buildFrame("FRX-043","Parameter No Selection", "frx", frx({}),                                                        true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="none" hideDynamicValues />),
+        buildFrame("FRX-032","Parameter Intensity Active", "frx", frx({}),                                                    true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="intensity" hideDynamicValues />),
+        buildFrame("FRX-023","Parameter Degree",  "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="degree" hideDynamicValues />),
+        buildFrame("FRX-024","Parameter Density", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="density" hideDynamicValues />),
+        buildFrame("FRX-025","Parameter Pause",   "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedParam="pause" hideDynamicValues />),
+        buildFrame("FRX-026","Size Lock Active",   "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeLocked hideDynamicValues />),
+        buildFrame("FRX-027","Width Plus Active",  "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxWidth-inc" hideDynamicValues />),
+        buildFrame("FRX-028","Width Minus Active", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxWidth-dec" hideDynamicValues />),
+        buildFrame("FRX-029","Length Plus Active", "frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxLength-inc" hideDynamicValues />),
+        buildFrame("FRX-030","Length Minus Active","frx", frx({}),                                                            true, true, undefined, <HMI2FRX s={frx({})} upd={noopUpd} onMenu={noopMenu} forcedSizeControl="frxLength-dec" hideDynamicValues />),
       ],
     },
     {

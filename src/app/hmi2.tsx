@@ -159,6 +159,7 @@ function HParamCol({
                        onInc,
                        locked,
                        emphasized = false,
+                       hideValue = false,
                    }: {
     label: string;
     value: string | number;
@@ -167,6 +168,7 @@ function HParamCol({
     onInc: () => void;
     locked: boolean;
     emphasized?: boolean;
+    hideValue?: boolean;
 }) {
     const [pressedControl, setPressedControl] = useState<"inc" | "dec" | null>(null);
     const [integerPart, decimalPart] = String(value).split(".");
@@ -234,15 +236,17 @@ function HParamCol({
                     style={{
                         display: "flex",
                         alignItems: "baseline",
-                        gap: "6px"
+                        gap: "6px",
+                        visibility: hideValue ? "hidden" : "visible"
 
                     }}
                 >
           <span
               style={{
-                  fontFamily: "'Inter', sans-serif",
+                  fontFamily: "'JetBrains Mono',monospace",
                   fontWeight: 500,
                   lineHeight: 1,
+                  letterSpacing: "-0.04em",
                   fontSize: emphasized ? 92 : 32,
                   //transform: emphasized ? "scale(1.18)" : "none",
                   transformOrigin: "center",
@@ -252,7 +256,7 @@ function HParamCol({
             {integerPart}
               {decimalPart !== undefined && (
                   <>
-                      <span>.</span>
+                      <span style={{margin: "0 -0.14em"}}>.</span>
                       {decimalPart}
                   </>
               )}
@@ -330,6 +334,7 @@ function HSizeParamCol({
                            onInc,
                            locked,
                            forcedPressed = null,
+                           hideValue = false,
                        }: {
     label: string;
     value: number;
@@ -338,6 +343,7 @@ function HSizeParamCol({
     onInc: () => void;
     locked: boolean;
     forcedPressed?: "inc" | "dec" | null;
+    hideValue?: boolean;
 }) {
     const [pressedControl, setPressedControl] = useState<"inc" | "dec" | null>(forcedPressed);
     const controlStyle = (direction: "inc" | "dec"): React.CSSProperties => ({
@@ -422,7 +428,8 @@ function HSizeParamCol({
                     padding: "14px 0",
                     boxSizing: "border-box",
                     color: "#d8e8ff",
-                    marginLeft: "23px"
+                    marginLeft: "23px",
+                    visibility: hideValue ? "hidden" : "visible"
                 }}>
                     <span style={{
                         fontFamily: "'JetBrains Mono',monospace",
@@ -461,6 +468,7 @@ function HSizeControlsSection({
                                   onWidthChange,
                                   onLengthChange,
                                   forcedSizeControl,
+                                  hideValues = false,
                               }: {
     width: number;
     length: number;
@@ -470,6 +478,7 @@ function HSizeControlsSection({
     onWidthChange: (delta: number) => void;
     onLengthChange: (delta: number) => void;
     forcedSizeControl?: "frxWidth-inc" | "frxWidth-dec" | "frxLength-inc" | "frxLength-dec";
+    hideValues?: boolean;
 }) {
     const controls = [
         {key: "frxWidth", label: "WIDTH", value: width, onChange: onWidthChange},
@@ -500,6 +509,7 @@ function HSizeControlsSection({
                             value={control.value}
                             unit="mm"
                             locked={sizeLocked || disabled}
+                            hideValue={hideValues}
                             forcedPressed={
                                 forcedSizeControl === `${control.key}-inc`
                                     ? "inc"
@@ -1631,11 +1641,13 @@ export function HMI2COS({
                             upd,
                             onMenu,
                             forcedParam,
+                            hideDynamicValues = false,
                         }: {
     s: HMIState2;
     upd: (p: Partial<HMIState2>) => void;
     onMenu: (k: "memo" | "call" | "save") => void;
-    forcedParam?: "power" | "duration" | "interval";
+    forcedParam?: "power" | "duration" | "interval" | "onTime" | "offTime" | "none";
+    hideDynamicValues?: boolean;
 }) {
     const locked = s.laserState === "lasering";
     const [activeCosParam, setActiveCosParam] = useState<
@@ -1678,8 +1690,8 @@ export function HMI2COS({
             onInc: () => upd({co2Interval: adjVal(s.co2Interval, 1, 1, 100, 1)}),
         },
     };
-    const selectedCosParamKey = forcedParam ?? activeCosParam;
-    const selectedCosParam = cosParams[selectedCosParamKey];
+    const selectedCosParamKey = forcedParam === "none" ? null : (forcedParam ?? activeCosParam);
+    const selectedCosParam = selectedCosParamKey ? cosParams[selectedCosParamKey] : null;
 
     const laserModeIcons: {
         CW: React.ReactNode;
@@ -1983,15 +1995,18 @@ export function HMI2COS({
                             padding: "16px"
                         }}
                     >
-                        <HParamCol
-                            label={selectedCosParam.label}
-                            value={selectedCosParam.value}
-                            unit={selectedCosParam.unit}
-                            locked={locked}
-                            onDec={selectedCosParam.onDec}
-                            onInc={selectedCosParam.onInc}
-                            emphasized
-                        />
+                        {selectedCosParam && (
+                            <HParamCol
+                                label={selectedCosParam.label}
+                                value={selectedCosParam.value}
+                                unit={selectedCosParam.unit}
+                                locked={locked}
+                                onDec={selectedCosParam.onDec}
+                                onInc={selectedCosParam.onInc}
+                                emphasized
+                                hideValue={hideDynamicValues}
+                            />
+                        )}
                     </div>
                 </div>
             </div>
@@ -2021,13 +2036,15 @@ export function HMI2FRX({
                             forcedParam,
                             forcedSizeLocked,
                             forcedSizeControl,
+                            hideDynamicValues = false,
                         }: {
     s: HMIState2;
     upd: (p: Partial<HMIState2>) => void;
     onMenu: (k: "memo" | "call" | "save") => void;
-    forcedParam?: "intensity" | "degree" | "density" | "pause";
+    forcedParam?: "intensity" | "degree" | "density" | "pause" | "none";
     forcedSizeLocked?: boolean;
     forcedSizeControl?: "frxWidth-inc" | "frxWidth-dec" | "frxLength-inc" | "frxLength-dec";
+    hideDynamicValues?: boolean;
 }) {
     const locked = s.laserState === "lasering";
     const [sizeLocked, setSizeLocked] = useState(forcedSizeLocked ?? false);
@@ -2064,8 +2081,8 @@ export function HMI2FRX({
             onInc: () => upd({frxPauseTime: adjVal(s.frxPauseTime, 0.1, 0.1, 5, 0.1)}),
         },
     };
-    const selectedParamKey = forcedParam ?? activeParam;
-    const selectedParam = frxParams[selectedParamKey];
+    const selectedParamKey = forcedParam === "none" ? null : (forcedParam ?? activeParam);
+    const selectedParam = selectedParamKey ? frxParams[selectedParamKey] : null;
 
     const shapes: [string, React.ReactNode][] = [
         [
@@ -2273,6 +2290,7 @@ export function HMI2FRX({
                     onLengthChange={(delta) =>
                         upd({frxLength: adjVal(s.frxLength, delta, 5, 40, 1)})
                     }
+                    hideValues={hideDynamicValues}
                 />
             </div>
             {/* RIGHT: parameters */}
@@ -2345,15 +2363,18 @@ export function HMI2FRX({
                             padding: "16px"
                         }}
                     >
-                        <HParamCol
-                            label={selectedParam.label}
-                            value={selectedParam.value}
-                            unit={selectedParam.unit}
-                            locked={locked}
-                            onDec={selectedParam.onDec}
-                            onInc={selectedParam.onInc}
-                            emphasized
-                        />
+                        {selectedParam && (
+                            <HParamCol
+                                label={selectedParam.label}
+                                value={selectedParam.value}
+                                unit={selectedParam.unit}
+                                locked={locked}
+                                onDec={selectedParam.onDec}
+                                onInc={selectedParam.onInc}
+                                emphasized
+                                hideValue={hideDynamicValues}
+                            />
+                        )}
                     </div>
                 </div>
             </div>
