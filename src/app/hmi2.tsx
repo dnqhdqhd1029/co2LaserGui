@@ -15,8 +15,10 @@ export interface HMIState2 {
     co2Power: number;
     co2Duration: number;
     co2Interval: number;
+    co2OnTime: number;
+    co2OffTime: number;
     co2LaserMode: "CW" | "Pulse";
-    co2PulseMode: "Single" | "Repeat" | "Stream" | "Series";
+    co2PulseMode: "Single" | "Continuous" | "Repeat" | "Stream" | "Series";
     co2Tab: "Normal" | "Fractional";
     // FRX params
     frxIntensity: number;
@@ -39,6 +41,8 @@ export const HMI2_DEFAULT: HMIState2 = {
     co2Power: 30,
     co2Duration: 0.7,
     co2Interval: 9,
+    co2OnTime: 1.0,
+    co2OffTime: 0.5,
     co2LaserMode: "Pulse",
     co2PulseMode: "Repeat",
     co2Tab: "Normal",
@@ -202,7 +206,7 @@ function HParamCol({
                     alignItems: "center",
                     justifyContent: "center",
                     transition: "all 0.1s",
-                    height: emphasized ? 94 : 50,
+                    height: emphasized ? 84 : 40,
                     padding: emphasized ? "10px 0" : "10px 0",
                     background: pressedControl === "inc"
                         ? "rgba(255,255,255,0.035)"
@@ -292,7 +296,7 @@ function HParamCol({
                     alignItems: "center",
                     justifyContent: "center",
                     transition: "all 0.1s",
-                    height: emphasized ? 94 : 50,
+                    height: emphasized ? 84 : 40,
                     padding: emphasized ? "18px 0" : "10px 0",
                     background: pressedControl === "dec"
                         ? "rgba(255,255,255,0.035)"
@@ -348,7 +352,7 @@ function HSizeParamCol({
     const [pressedControl, setPressedControl] = useState<"inc" | "dec" | null>(forcedPressed);
     const controlStyle = (direction: "inc" | "dec"): React.CSSProperties => ({
         width: "100%",
-        height: direction === "inc" ? "50px" : "46px",
+        height: direction === "inc" ? "40px" : "36px",
         borderRadius: direction === "inc" ? "10px 10px 0 0" : "0 0 10px 10px",
         border: "1px solid transparent",
         borderBottom: direction === "inc" ? `1px solid ${H.border}` : undefined,
@@ -1651,7 +1655,7 @@ export function HMI2COS({
 }) {
     const locked = s.laserState === "lasering";
     const [activeCosParam, setActiveCosParam] = useState<
-        "power" | "duration" | "interval"
+        "power" | "duration" | "interval" | "onTime" | "offTime"
     >("power");
     const cosParams = {
         power: {
@@ -1676,18 +1680,18 @@ export function HMI2COS({
             onInc: () => upd({co2Interval: adjVal(s.co2Interval, 1, 1, 100, 1)}),
         },
         onTime: {
-            label: "On Time",
-            value: s.co2Interval,
-            unit: "ms",
-            onDec: () => upd({co2Interval: adjVal(s.co2Interval, -1, 1, 100, 1)}),
-            onInc: () => upd({co2Interval: adjVal(s.co2Interval, 1, 1, 100, 1)}),
+            label: "OnTime",
+            value: s.co2OnTime.toFixed(1),
+            unit: "s",
+            onDec: () => upd({co2OnTime: adjVal(s.co2OnTime, -0.1, 0.1, 10, 0.1)}),
+            onInc: () => upd({co2OnTime: adjVal(s.co2OnTime, 0.1, 0.1, 10, 0.1)}),
         },
         offTime: {
-            label: "Off Time",
-            value: s.co2Interval,
-            unit: "ms",
-            onDec: () => upd({co2Interval: adjVal(s.co2Interval, -1, 1, 100, 1)}),
-            onInc: () => upd({co2Interval: adjVal(s.co2Interval, 1, 1, 100, 1)}),
+            label: "OffTime",
+            value: s.co2OffTime.toFixed(1),
+            unit: "s",
+            onDec: () => upd({co2OffTime: adjVal(s.co2OffTime, -0.1, 0.1, 10, 0.1)}),
+            onInc: () => upd({co2OffTime: adjVal(s.co2OffTime, 0.1, 0.1, 10, 0.1)}),
         },
     };
     const selectedCosParamKey = forcedParam === "none" ? null : (forcedParam ?? activeCosParam);
@@ -1734,6 +1738,7 @@ export function HMI2COS({
 
     const pulseModeIcons: {
         Single: React.ReactNode;
+        Continuous: React.ReactNode;
         Repeat: React.ReactNode;
         Stream: React.ReactNode;
         Series: React.ReactNode;
@@ -1753,6 +1758,26 @@ export function HMI2COS({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                 />
+            </svg>
+        ),
+        Continuous: (
+            <svg
+                width={48}
+                height={18}
+                viewBox="0 0 56 18"
+                fill="none"
+            >
+                <rect
+                    x={3}
+                    y={6}
+                    width={50}
+                    height={6}
+                    rx={3}
+                    fill="currentColor"
+                    opacity={0.9}
+                />
+                <circle cx={3} cy={9} r={2} fill="currentColor"/>
+                <circle cx={53} cy={9} r={2} fill="currentColor"/>
             </svg>
         ),
         Repeat: (
@@ -1891,7 +1916,7 @@ export function HMI2COS({
                     <div
                         style={{
                             display: "grid",
-                            gridTemplateColumns: "1fr 1fr",
+                            gridTemplateColumns: "1fr 1fr 1fr ",
                             //gridTemplateRows: "1fr 1fr",
                             gap: "18px",
                             flex: 1,
@@ -1902,6 +1927,7 @@ export function HMI2COS({
                         {(
                             [
                                 "Single",
+                                "Continuous",
                                 "Repeat",
                                 // "Stream",
                                 // "Series",
@@ -1959,7 +1985,7 @@ export function HMI2COS({
                                         width: "100%",
                                         minWidth: 0,
                                         boxSizing: "border-box",
-                                        height: "88px",
+                                        height: "108px",
                                         borderRadius: "10px",
                                         fontSize: "18px",
                                         lineHeight: 1.25,
@@ -1974,10 +2000,33 @@ export function HMI2COS({
                                             ? "inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -2px 5px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.28), 0 0 12px rgba(0,202,228,0.10)"
                                             : "inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 5px rgba(0,0,0,0.18), 0 3px 6px rgba(0,0,0,0.28)",
                                         color: active ? H.cyan : H.textSub,
-                                        fontWeight: active ? 700 : 500
+                                        fontWeight: active ? 700 : 500,
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        gap: "5px",
+                                        padding: "8px 6px"
                                     }}
                                 >
-                                    {cosParams[key].label}
+                                    {!hideDynamicValues && (
+                                        <span style={{
+                                            display: "flex",
+                                            alignItems: "baseline",
+                                            gap: "3px",
+                                            color: active ? H.cyan : H.textDim
+                                        }}>
+                                             <span style={{
+                                                 fontSize: "20px",
+                                                 fontWeight: 700
+                                             }}>{cosParams[key].value}</span>
+                                            {cosParams[key].unit && <span style={{
+                                                fontSize: "14px",
+                                                fontWeight: 600
+                                            }}>{cosParams[key].unit}</span>}
+                                         </span>
+                                    )}
+                                    <span>{cosParams[key].label}</span>
                                 </button>
                             );
                         })}
@@ -2327,7 +2376,7 @@ export function HMI2FRX({
                                     key={key}
                                     onClick={() => setActiveParam(key)}
                                     style={{
-                                        height: "88px",
+                                        height: "108px",
                                         borderRadius: "10px",
                                         fontSize: "22px",
                                         lineHeight: 1.25,
@@ -2342,10 +2391,33 @@ export function HMI2FRX({
                                             ? "inset 0 1px 0 rgba(255,255,255,0.16), inset 0 -2px 5px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.28), 0 0 12px rgba(46,130,255,0.10)"
                                             : "inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -2px 5px rgba(0,0,0,0.18), 0 3px 6px rgba(0,0,0,0.28)",
                                         color: active ? H.blue : H.textSub,
-                                        fontWeight: active ? 700 : 500
+                                        fontWeight: active ? 700 : 500,
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        alignItems: "center",
+                                        justifyContent: "center",
+                                        gap: "5px",
+                                        padding: "8px 6px"
                                     }}
                                 >
-                                    {frxParams[key].label}
+                                    {!hideDynamicValues && (
+                                        <span style={{
+                                            display: "flex",
+                                            alignItems: "baseline",
+                                            gap: "3px",
+                                            color: active ? H.blue : H.textDim
+                                        }}>
+                                             <span style={{
+                                                 fontSize: "20px",
+                                                 fontWeight: 700
+                                             }}>{frxParams[key].value}</span>
+                                            {frxParams[key].unit && <span style={{
+                                                fontSize: "14px",
+                                                fontWeight: 600
+                                            }}>{frxParams[key].unit}</span>}
+                                         </span>
+                                    )}
+                                    <span>{frxParams[key].label}</span>
                                 </button>
                             );
                         })}
@@ -2360,7 +2432,7 @@ export function HMI2FRX({
                             borderRadius: "16px",
                             background: "rgba(0,0,0,0.12)",
                             border: `1px solid ${H.border}`,
-                            padding: "16px"
+                            padding: "16px",
                         }}
                     >
                         {selectedParam && (

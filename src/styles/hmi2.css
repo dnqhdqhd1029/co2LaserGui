@@ -28,7 +28,7 @@
 .hmi-param-control__triangle {
     position: relative;
     width: 62px;
-    height: 54px;
+    height: 34px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -81,7 +81,7 @@
 
 .hmi-param-control[data-emphasized="true"] .hmi-param-control__triangle {
     width: 84px;
-    height: 56px;
+    height: 66px;
 }
 
 .hmi-param-control[data-emphasized="true"] .hmi-param-control__symbol {
@@ -89,7 +89,7 @@
 }
 
 .hmi-param-control--dec .hmi-param-control__symbol {
-    transform: translateY(-8px);
+    transform: translateY(-2px);
 }
 
 .hmi-param-control:disabled .hmi-param-control__triangle {
@@ -273,8 +273,8 @@
 
 /* LASER MODE 전용 크기 조정 */
 .hmi-laser-mode-btn {
-    height: 88px;
-    min-height: 88px;
+    height: 108px;
+    min-height: 108px;
 }
 
 .hmi-laser-mode-btn__icon {
@@ -309,7 +309,7 @@
 
 .hmi-frx-shape-list {
     display: flex;
-    height: 125px;
+    height: 147px;
     gap: 12px;
     padding: 18px;
 }
