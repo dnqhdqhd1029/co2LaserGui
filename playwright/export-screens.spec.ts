@@ -13,6 +13,7 @@ function safeFilename(value: string) {
 }
 
 test("export every HMI screen state as a 1024x768 PNG", async ({ page }) => {
+  test.setTimeout(300_000);
   await mkdir(EXPORT_DIR, { recursive: true });
   if (!TARGET_FRAME_ID) {
     const previousFiles = await readdir(EXPORT_DIR);
