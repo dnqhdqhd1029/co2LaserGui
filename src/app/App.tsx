@@ -4,17 +4,18 @@ import { HMIRoot2, HMIState2, HMI2_DEFAULT } from "./hmi2";
 import {
   SectionId,
   SECTIONS,
-  CoverPage,
-  ProjectInfoPage,
-  DesignSystemPage,
-  ComponentsPage,
-  IconsPage,
-  UserFlowPage,
   ScreensPage,
-  AssetsPage,
-  DevGuidePage,
-  RevisionPage,
 } from "./doc-pages";
+import {
+  CurrentCoverPage,
+  CurrentProjectInfoPage,
+  CurrentDesignSystemPage,
+  CurrentComponentsPage,
+  CurrentIconsPage,
+  CurrentUserFlowPage,
+  CurrentAssetsPage,
+  CurrentDevGuidePage,
+} from "./current-doc-pages";
 
 function PrototypePage({ onStateChange }: { onStateChange: (s: HMIState2) => void }) {
   return (
@@ -70,16 +71,15 @@ export default function App() {
 
   const sectionContent = () => {
     if (section === "proto") return <PrototypePage onStateChange={handleStateChange} />;
-    if (section === "01") return <CoverPage />;
-    if (section === "02") return <ProjectInfoPage />;
-    if (section === "03") return <DesignSystemPage />;
-    if (section === "04") return <ComponentsPage />;
-    if (section === "05") return <IconsPage />;
-    if (section === "06") return <UserFlowPage />;
+    if (section === "01") return <CurrentCoverPage />;
+    if (section === "02") return <CurrentProjectInfoPage />;
+    if (section === "03") return <CurrentDesignSystemPage />;
+    if (section === "04") return <CurrentComponentsPage />;
+    if (section === "05") return <CurrentIconsPage />;
+    if (section === "06") return <CurrentUserFlowPage />;
     if (section === "07") return <ScreensPage liveState={liveState} />;
-    if (section === "08") return <AssetsPage />;
-    if (section === "09") return <DevGuidePage />;
-    if (section === "10") return <RevisionPage />;
+    if (section === "08") return <CurrentAssetsPage />;
+    if (section === "09") return <CurrentDevGuidePage />;
     return null;
   };
 

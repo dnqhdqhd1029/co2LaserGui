@@ -23,7 +23,7 @@ import {
   HMIState2, HMI2_DEFAULT, LaserState2,
   HTopBar, HLaserBar,
   HMI2Splash, HMI2Home, HMI2COS, HMI2FRX,
-  HModal, HCameraModal, HMemoModal, HCallModal, HSaveModal,
+  HModal, HCameraModal, HMemoModal, HCallModal, HSaveModal, HSystemErrorPopup,
 } from "./hmi2";
 
 // ── noop helpers ──────────────────────────────────────────────────────────────
@@ -113,6 +113,7 @@ function StaticFrame({
             mode={mode}
             soundOn={soundOn}
             aimingLevel={aimingLevel}
+            hideAimingValue
             onMenu={mode ? noopMenu : undefined}
             onCamera={noop}
             onSound={noop}
@@ -173,8 +174,8 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
   const noPulseMode = "__none__" as HMIState2["co2PulseMode"];
   const noFrxShape = "__none__" as HMIState2["frxShape"];
   const noFrxScanMode = "__none__" as HMIState2["frxScanMode"];
-  // Export frames are design assets: dynamic numeric values must remain blank
-  // so the value layer can be supplied separately after extraction.
+  // The Screens catalog is the exact EMVD export source. Dynamic values and
+  // units stay blank both in its preview and in the captured PNG.
   const hideExportValues = true;
   // This ref points to the preview mount only. The actual screen frame is its
   // single, top-level child returned by FrameDef.render().
@@ -313,7 +314,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
     id, name,
     render: () => (
         <div className="hmi-root" data-screen-frame="true" style={{ width:LAYOUT.canvasW, height:LAYOUT.canvasH, display:"flex", flexDirection:"column", background:H.bg, position:"relative", overflow:"hidden", fontFamily:"'Inter','Noto Sans KR',system-ui,sans-serif", flexShrink:0 }}>
-        {showTopBar && <HTopBar mode={mode} onBack={mode ? noop : undefined} soundOn={s?.soundOn??true} aimingLevel={(s?.aimingLevel??2) as 0|1|2|3|4|5} onMenu={mode ? noopMenu : undefined} activeMenu={activeMenu} cameraActive={cameraActive} onCamera={noop} onSound={noop} onAiming={noopAim} />}
+        {showTopBar && <HTopBar mode={mode} onBack={mode ? noop : undefined} soundOn={s?.soundOn??true} aimingLevel={(s?.aimingLevel??2) as 0|1|2|3|4|5} hideAimingValue onMenu={mode ? noopMenu : undefined} activeMenu={activeMenu} cameraActive={cameraActive} onCamera={noop} onSound={noop} onAiming={noopAim} />}
         <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden", position:"relative", minHeight:0 }}>
           <div style={{ flex:1, display:"flex", flexDirection:"column", overflow:"hidden" }}>
             {children ?? (
@@ -325,7 +326,7 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
             )}
           </div>
           {showLaserBar && s && <HLaserBar state={s.laserState} onPress={noop} />}
-          {overlay}
+          {overlay && <div className="hmi-export-modal-textless">{overlay}</div>}
         </div>
       </div>
     ),
@@ -441,13 +442,11 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
         buildFrame("COS-002","CW Only",           "cos", cos({ co2LaserMode:"CW", co2PulseMode:noPulseMode }),                true, true),
         buildFrame("COS-003","Pulse Only",        "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:noPulseMode }),             true, true),
         buildFrame("COS-026","Pulse Mode Only · Single", "cos", cos({ co2LaserMode:noLaserMode, co2PulseMode:"Single" }),      true, true),
-        buildFrame("COS-027","Pulse Mode Only · Repeat", "cos", cos({ co2LaserMode:noLaserMode, co2PulseMode:"Repeat" }),      true, true),
-        buildFrame("COS-028","Pulse Mode Only · Stream", "cos", cos({ co2LaserMode:noLaserMode, co2PulseMode:"Stream" }),      true, true),
-        buildFrame("COS-029","Pulse Mode Only · Series", "cos", cos({ co2LaserMode:noLaserMode, co2PulseMode:"Series" }),      true, true),
+        buildFrame("COS-027","Pulse Mode Only · Continuous", "cos", cos({ co2LaserMode:noLaserMode, co2PulseMode:"Continuous" }), true, true),
+        buildFrame("COS-028","Pulse Mode Only · Repeat", "cos", cos({ co2LaserMode:noLaserMode, co2PulseMode:"Repeat" }),      true, true),
         buildFrame("COS-004","Pulse Single",      "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Single" }),              true, true),
-        buildFrame("COS-005","Pulse Repeat",      "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Repeat" }),              true, true),
-        buildFrame("COS-006","Pulse Stream",      "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Stream" }),              true, true),
-        buildFrame("COS-007","Pulse Series",      "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Series" }),              true, true),
+        buildFrame("COS-005","Pulse Continuous",  "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Continuous" }),          true, true),
+        buildFrame("COS-006","Pulse Repeat",      "cos", cos({ co2LaserMode:"Pulse", co2PulseMode:"Repeat" }),              true, true),
         buildFrame("COS-011","Aiming OFF",        "cos", cos({ aimingLevel:0 as 0|1|2|3|4|5 }),                            true, true),
         buildFrame("COS-012","Aiming Level 1",    "cos", cos({ aimingLevel:1 as 0|1|2|3|4|5 }),                            true, true),
         buildFrame("COS-013","Aiming Level 2",    "cos", cos({ aimingLevel:2 as 0|1|2|3|4|5 }),                            true, true),
@@ -517,12 +516,29 @@ export function ScreensExportPage({ liveState = HMI2_DEFAULT }: { liveState?: HM
         buildFrame("MOD-001","COS Memo",            "cos", cos({}), true, true, <HMemoModal onClose={noop} />, undefined, "memo"),
         buildFrame("MOD-002","COS Call",            "cos", cos({}), true, true, <HCallModal s={cos({})} upd={noopUpd} onClose={noop} />, undefined, "call"),
         buildFrame("MOD-003","COS Save",            "cos", cos({}), true, true, <HSaveModal s={cos({})} onClose={noop} />, undefined, "save"),
-        buildFrame("MOD-004","COS Camera",          "cos", cos({}), true, true, <HCameraModal />, undefined, null, true),
-        buildFrame("MOD-005","Camera Keyboard Open","cos", cos({}), true, true, <HCameraModal forcedKeyboardOpen />, undefined, null, true),
+        buildFrame("MOD-004","COS Calibration Work",          "cos", cos({}), true, true, <HCameraModal />, undefined, null, true),
+        buildFrame("MOD-005A","Calibration Work Keyboard · Korean","cos", cos({}), true, true, <HCameraModal forcedKeyboardOpen forcedKeyboardLayout="ko" />, undefined, null, true),
+        buildFrame("MOD-005B","Calibration Work Keyboard · English","cos", cos({}), true, true, <HCameraModal forcedKeyboardOpen forcedKeyboardLayout="en" />, undefined, null, true),
+        buildFrame("MOD-005C","Calibration Work Keyboard · Symbols","cos", cos({}), true, true, <HCameraModal forcedKeyboardOpen forcedKeyboardLayout="symbol" />, undefined, null, true),
         buildFrame("MOD-006","FRX Memo",            "frx", frx({}), true, true, <HMemoModal onClose={noop} />, undefined, "memo"),
         buildFrame("MOD-007","FRX Call",            "frx", frx({}), true, true, <HCallModal s={frx({})} upd={noopUpd} onClose={noop} />, undefined, "call"),
         buildFrame("MOD-008","FRX Save",            "frx", frx({}), true, true, <HSaveModal s={frx({})} onClose={noop} />, undefined, "save"),
-        buildFrame("MOD-009","FRX Camera",          "frx", frx({}), true, true, <HCameraModal />, undefined, null, true),
+        buildFrame("MOD-009","FRX Calibration Work",          "frx", frx({}), true, true, <HCameraModal />, undefined, null, true),
+        buildFrame(
+          "MOD-010",
+          "System Error Popup",
+          "cos",
+          cos({}),
+          true,
+          true,
+          <HSystemErrorPopup
+            title="System Error"
+            showContent={false}
+            showActions={false}
+            onConfirm={noop}
+            onCancel={noop}
+          />,
+        ),
       ],
     },
   ];

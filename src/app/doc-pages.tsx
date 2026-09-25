@@ -32,8 +32,7 @@ export type SectionId =
   | "06"
   | "07"
   | "08"
-  | "09"
-  | "10";
+  | "09";
 
 export const SECTIONS: {
   id: SectionId;
@@ -246,27 +245,6 @@ export const SECTIONS: {
       >
         <polyline points="16 18 22 12 16 6" />
         <polyline points="8 6 2 12 8 18" />
-      </svg>
-    ),
-  },
-  {
-    id: "10",
-    num: "10",
-    label: "Revision History",
-    icon: (
-      <svg
-        width={16}
-        height={16}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth={1.8}
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <polyline points="1 4 1 10 7 10" />
-        <path d="M3.51 15a9 9 0 1 0 .49-4.5L1 10" />
-        <polyline points="12 7 12 12 15 14" />
       </svg>
     ),
   },

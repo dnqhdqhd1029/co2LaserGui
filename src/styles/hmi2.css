@@ -20,6 +20,119 @@
     --hmi-control-transition: 140ms;
 }
 
+/* Section 07 export assets: keep modal geometry, surfaces, and icons while
+   leaving every text layer blank for EMVD. */
+.hmi-export-modal-textless {
+    display: contents;
+}
+
+.hmi-export-modal-textless,
+.hmi-export-modal-textless * {
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+    text-shadow: none !important;
+}
+
+.hmi-export-modal-textless svg {
+    color: var(--hmi-text-secondary) !important;
+    -webkit-text-fill-color: initial !important;
+}
+
+.hmi-export-modal-textless .hmi-modal__badge {
+    color: #1e7ef5 !important;
+    -webkit-text-fill-color: #1e7ef5 !important;
+}
+
+.hmi-export-modal-textless .hmi-modal__static-action-label {
+    color: #d8e8ff !important;
+    -webkit-text-fill-color: #d8e8ff !important;
+}
+
+.hmi-export-modal-textless .hmi-system-dialog__title {
+    color: var(--hmi-text-primary) !important;
+    -webkit-text-fill-color: var(--hmi-text-primary) !important;
+}
+
+.hmi-export-modal-textless .hmi-system-dialog__icon,
+.hmi-export-modal-textless .hmi-system-dialog__icon svg,
+.hmi-export-modal-textless .hmi-system-dialog__icon svg * {
+    color: #f87171 !important;
+    stroke: #f87171 !important;
+    -webkit-text-fill-color: initial !important;
+    opacity: 1 !important;
+}
+
+.hmi-export-modal-textless .hmi-system-dialog__icon svg circle {
+    fill: #f87171 !important;
+    stroke: none !important;
+}
+
+.hmi-export-modal-textless .hmi-system-dialog__close,
+.hmi-export-modal-textless .hmi-system-dialog__close svg,
+.hmi-export-modal-textless .hmi-system-dialog__close svg * {
+    color: #7a9bbf !important;
+    stroke: #7a9bbf !important;
+    -webkit-text-fill-color: initial !important;
+    opacity: 1 !important;
+}
+
+.hmi-export-modal-textless .hmi-modal__close,
+.hmi-export-modal-textless .hmi-modal__close svg {
+    color: #7a9bbf !important;
+    -webkit-text-fill-color: initial !important;
+}
+
+.hmi-export-modal-textless .hmi-modal__close svg,
+.hmi-export-modal-textless .hmi-modal__close svg * {
+    stroke: #7a9bbf !important;
+    fill: none !important;
+    opacity: 1 !important;
+}
+
+.hmi-export-modal-textless .hmi-modal__keyboard-toggle,
+.hmi-export-modal-textless .hmi-modal__keyboard-toggle svg,
+.hmi-export-modal-textless .hmi-modal__keyboard-toggle svg * {
+    color: #7a9bbf !important;
+    stroke: #7a9bbf !important;
+    fill: none !important;
+    -webkit-text-fill-color: initial !important;
+    opacity: 1 !important;
+}
+
+.hmi-export-modal-textless .hmi-modal__keyboard-toggle[aria-pressed="true"],
+.hmi-export-modal-textless .hmi-modal__keyboard-toggle[aria-pressed="true"] svg,
+.hmi-export-modal-textless .hmi-modal__keyboard-toggle[aria-pressed="true"] svg * {
+    color: #8abcf8 !important;
+    stroke: #8abcf8 !important;
+}
+
+.hmi-export-modal-textless .hmi-camera-keyboard__header,
+.hmi-export-modal-textless .hmi-camera-keyboard__key {
+    color: #d8e8ff !important;
+    -webkit-text-fill-color: #d8e8ff !important;
+}
+
+.hmi-export-modal-textless .hmi-camera-keyboard__header {
+    color: #7a9bbf !important;
+    -webkit-text-fill-color: #7a9bbf !important;
+}
+
+.hmi-export-modal-textless .hmi-camera-keyboard__close,
+.hmi-export-modal-textless .hmi-camera-keyboard__close svg,
+.hmi-export-modal-textless .hmi-camera-keyboard__close svg * {
+    color: #7a9bbf !important;
+    stroke: #7a9bbf !important;
+    fill: none !important;
+    -webkit-text-fill-color: initial !important;
+    opacity: 1 !important;
+}
+
+.hmi-export-modal-textless input::placeholder,
+.hmi-export-modal-textless textarea::placeholder {
+    color: transparent !important;
+    -webkit-text-fill-color: transparent !important;
+}
+
 /* HParamCol +/- triangle controls */
 .hmi-param-control {
     overflow: hidden;
@@ -393,6 +506,7 @@
     align-content: center;
     justify-content: center;
     gap: 10px;
+    padding-top: 5px;
 }
 
 .hmi-scan-mode-btn__icon {
@@ -575,6 +689,212 @@
 }
 
 /* Popup system: MEMO / CALL / SAVE / CAMERA */
+.hmi-system-dialog-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 70;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(4, 9, 18, .78);
+}
+
+.hmi-system-dialog {
+    width: 680px;
+    border: 2px solid rgba(239, 68, 68, .65);
+    border-radius: 18px;
+    overflow: hidden;
+    background: #0f1928;
+    box-shadow: 0 24px 70px rgba(0, 0, 0, .58), 0 0 28px rgba(239, 68, 68, .1);
+}
+
+.hmi-system-dialog__header {
+    min-height: 96px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0 30px;
+    border-bottom: 1px solid rgba(239, 68, 68, .3);
+    background: rgba(239, 68, 68, .09);
+}
+
+.hmi-system-dialog__icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(239, 68, 68, .5);
+    border-radius: 12px;
+    background: rgba(239, 68, 68, .14);
+    color: #f87171;
+}
+
+.hmi-system-dialog__icon svg {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.hmi-system-dialog__icon circle {
+    fill: currentColor;
+    stroke: none;
+}
+
+.hmi-system-dialog__title {
+    margin: 0;
+    color: var(--hmi-text-primary);
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+
+.hmi-system-dialog__close {
+    width: 42px;
+    height: 42px;
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--hmi-border);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .05);
+    color: var(--hmi-text-secondary);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.hmi-system-dialog__close svg,
+.hmi-system-dialog__close svg * {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+}
+
+.hmi-system-dialog__content {
+    min-height: 260px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 36px 40px;
+}
+
+.hmi-system-dialog__message {
+    margin: 0;
+    color: #c9d9ed;
+    font-size: 18px;
+    line-height: 1.55;
+}
+
+.hmi-system-dialog__code {
+    align-self: flex-start;
+    margin-top: 18px;
+    padding: 8px 12px;
+    border: 1px solid var(--hmi-border);
+    border-radius: 7px;
+    background: rgba(0, 0, 0, .22);
+    color: var(--hmi-text-secondary);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    letter-spacing: .04em;
+}
+
+.hmi-system-dialog__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 18px 24px 22px;
+    border-top: 1px solid var(--hmi-border);
+}
+
+.hmi-system-dialog__button {
+    min-width: 132px;
+    height: 48px;
+    padding: 0 22px;
+    border-radius: 10px;
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.hmi-system-dialog__button--primary {
+    border: 1px solid #338bf6;
+    background: #1e7ef5;
+    color: #fff;
+}
+
+.hmi-system-dialog__button--secondary {
+    border: 1px solid var(--hmi-border);
+    background: rgba(255, 255, 255, .04);
+    color: var(--hmi-text-secondary);
+}
+
+.hmi-base-layout {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    flex-direction: column;
+    background: #09111f;
+    color: #d8e8ff;
+}
+
+.hmi-base-layout__header {
+    height: 76px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 28px;
+    border-bottom: 1px solid var(--hmi-border);
+    background: #0d1628;
+}
+
+.hmi-base-layout__title {
+    flex: 1;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+
+.hmi-base-layout__exit {
+    min-width: 84px;
+    height: 42px;
+    padding: 0 18px;
+    border-radius: 9px;
+    border: 1px solid var(--hmi-border);
+    background: rgba(255, 255, 255, .05);
+    color: var(--hmi-text-secondary);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.hmi-base-layout__content {
+    min-height: 0;
+    flex: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 20px;
+    padding: 24px 28px 28px;
+}
+
+.hmi-base-layout__panel {
+    min-width: 0;
+    min-height: 0;
+    border: 1px solid var(--hmi-border);
+    border-radius: 16px;
+    background: #0f1928;
+    overflow: hidden;
+}
+
 .hmi-modal-overlay {
     position: absolute;
     inset: 0;

@@ -654,6 +654,7 @@ export function HTopBar({
                             onBack,
                             soundOn,
                             aimingLevel,
+                            hideAimingValue = false,
                             onMenu,
                             activeMenu = null,
                             cameraActive = false,
@@ -665,6 +666,7 @@ export function HTopBar({
     onBack?: () => void;
     soundOn: boolean;
     aimingLevel: 0 | 1 | 2 | 3 | 4 | 5;
+    hideAimingValue?: boolean;
     onMenu?: (k: "memo" | "call" | "save") => void;
     activeMenu?: "memo" | "call" | "save" | null;
     cameraActive?: boolean;
@@ -788,7 +790,7 @@ export function HTopBar({
                 )}
             </div>
             <div style={{flex: 1}}/>
-            {mode && onMenu && (["memo", "call", "save"] as const).map((item) => (
+            {mode && onMenu && (["call", "save"] as const).map((item) => (
                 <button
                     key={item}
                     onClick={() => onMenu(item)}
@@ -912,7 +914,8 @@ export function HTopBar({
                             lineHeight: 1,
                             fontWeight: 700,
                             minWidth: "20px",
-                            textAlign: "center"
+                            textAlign: "center",
+                            visibility: hideAimingValue ? "hidden" : "visible"
                         }}
                     >
             {aimLabel}
@@ -937,8 +940,8 @@ export function HTopBar({
             </div>
             <button
                 onClick={onCamera}
-                aria-label="Camera"
-                title="Camera"
+                aria-label="Open Calibration Work"
+                title="Calibration Work"
                 onMouseEnter={() => setCameraHover(true)}
                 onMouseLeave={() => setCameraHover(false)}
                 style={{
@@ -963,19 +966,6 @@ export function HTopBar({
                         : cameraHover ? "rgba(0,202,228,0.14)" : "rgba(0,202,228,0.08)"
                 }}
             >
-                <svg
-                    width={16}
-                    height={16}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                >
-                    <path d="M14.5 4 16 7h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3l1.5-3h5Z"/>
-                    <circle cx="12" cy="13" r="3.5"/>
-                </svg>
             </button>
             {/* Dropdown — positioned from topbar right, always within 1024px */}
             <AnimatePresence>
@@ -1926,8 +1916,8 @@ export function HMI2COS({
                     >
                         {(
                             [
-                                "Single",
                                 "Continuous",
+                                "Single",
                                 "Repeat",
                                 // "Stream",
                                 // "Series",
@@ -2009,24 +1999,28 @@ export function HMI2COS({
                                         padding: "8px 6px"
                                     }}
                                 >
-                                    {!hideDynamicValues && (
-                                        <span style={{
-                                            display: "flex",
-                                            alignItems: "baseline",
-                                            gap: "3px",
-                                            color: active ? H.cyan : H.textDim
-                                        }}>
+                                    <span style={{
+                                        display: "flex",
+                                        alignItems: "baseline",
+                                        gap: "3px",
+                                        color: active ? H.cyan : H.textDim,
+                                        fontFamily: "'JetBrains Mono', monospace",
+                                        visibility: hideDynamicValues ? "hidden" : "visible"
+                                    }}>
                                              <span style={{
-                                                 fontSize: "20px",
-                                                 fontWeight: 700
+                                                 fontSize: "28px",
+                                                 fontWeight: 700,
+                                                 letterSpacing: "-0.04em",
                                              }}>{cosParams[key].value}</span>
-                                            {cosParams[key].unit && <span style={{
-                                                fontSize: "14px",
-                                                fontWeight: 600
-                                            }}>{cosParams[key].unit}</span>}
-                                         </span>
-                                    )}
-                                    <span>{cosParams[key].label}</span>
+                                        {cosParams[key].unit && <span style={{
+                                            fontSize: "14px",
+                                            fontWeight: 600
+                                        }}>{cosParams[key].unit}</span>}
+                                    </span>
+                                    <span style={{
+                                        fontSize: "14px",
+                                        fontWeight: 700
+                                    }}>{cosParams[key].label}</span>
                                 </button>
                             );
                         })}
@@ -2400,24 +2394,28 @@ export function HMI2FRX({
                                         padding: "8px 6px"
                                     }}
                                 >
-                                    {!hideDynamicValues && (
-                                        <span style={{
-                                            display: "flex",
-                                            alignItems: "baseline",
-                                            gap: "3px",
-                                            color: active ? H.blue : H.textDim
-                                        }}>
+                                    <span style={{
+                                        display: "flex",
+                                        alignItems: "baseline",
+                                        gap: "3px",
+                                        color: active ? H.blue : H.textDim,
+                                        fontFamily: "'JetBrains Mono', monospace",
+                                        visibility: hideDynamicValues ? "hidden" : "visible"
+                                    }}>
                                              <span style={{
-                                                 fontSize: "20px",
-                                                 fontWeight: 700
+                                                 fontSize: "28px",
+                                                 fontWeight: 700,
+                                                 letterSpacing: "-0.04em",
                                              }}>{frxParams[key].value}</span>
-                                            {frxParams[key].unit && <span style={{
-                                                fontSize: "14px",
-                                                fontWeight: 600
-                                            }}>{frxParams[key].unit}</span>}
-                                         </span>
-                                    )}
-                                    <span>{frxParams[key].label}</span>
+                                        {frxParams[key].unit && <span style={{
+                                            fontSize: "14px",
+                                            fontWeight: 600
+                                        }}>{frxParams[key].unit}</span>}
+                                    </span>
+                                    <span style={{
+                                        fontSize: "16px",
+                                        fontWeight: 700
+                                    }}>{frxParams[key].label}</span>
                                 </button>
                             );
                         })}
@@ -2518,15 +2516,117 @@ export function HModal({
 // │  States  : 1 BMP (팝업 배경) + 닫기 버튼 2-state                               │
 // │  Export  : Popup_10_Memo.bmp                                                 │
 // └─────────────────────────────────────────────────────────────────────────────┘
-export function HCameraModal({
+export function HSystemErrorPopup({
+                                       title = "System Error",
+                                       message = "An unexpected system error has occurred.",
+                                       errorCode,
+                                       confirmLabel = "Confirm",
+                                       cancelLabel = "Cancel",
+                                       showCancel = false,
+                                       showContent = true,
+                                       showActions = true,
+                                       onConfirm = () => {},
+                                       onCancel = () => {},
+                                   }: {
+    title?: string;
+    message?: string;
+    errorCode?: string;
+    confirmLabel?: string;
+    cancelLabel?: string;
+    showCancel?: boolean;
+    showContent?: boolean;
+    showActions?: boolean;
+    onConfirm?: () => void;
+    onCancel?: () => void;
+}) {
+    return (
+        <div className="hmi-system-dialog-overlay">
+            <div className="hmi-system-dialog" role="alertdialog" aria-labelledby="system-dialog-title" aria-describedby="system-dialog-message">
+                <header className="hmi-system-dialog__header">
+                    <span className="hmi-system-dialog__icon" aria-hidden="true">
+                        <svg width="32" height="32" viewBox="0 0 24 24">
+                            <path d="M12 3 2.8 19h18.4L12 3Z"/>
+                            <path d="M12 8v5"/>
+                            <circle cx="12" cy="16.5" r=".8"/>
+                        </svg>
+                    </span>
+                    <h2 id="system-dialog-title" className="hmi-system-dialog__title">{title}</h2>
+                    <button
+                        className="hmi-system-dialog__close"
+                        onClick={onCancel}
+                        aria-label="Close"
+                    >
+                        <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M5 5L19 19M19 5L5 19"/>
+                        </svg>
+                    </button>
+                </header>
+                <div className="hmi-system-dialog__content">
+                    {showContent && (
+                        <>
+                            <p id="system-dialog-message" className="hmi-system-dialog__message">{message}</p>
+                            {errorCode && <div className="hmi-system-dialog__code">Error Code&nbsp;&nbsp;{errorCode}</div>}
+                        </>
+                    )}
+                </div>
+                {showActions && (
+                    <footer className="hmi-system-dialog__footer">
+                        {showCancel && <button className="hmi-system-dialog__button hmi-system-dialog__button--secondary" onClick={onCancel}>{cancelLabel}</button>}
+                        <button className="hmi-system-dialog__button hmi-system-dialog__button--primary" onClick={onConfirm}>{confirmLabel}</button>
+                    </footer>
+                )}
+            </div>
+        </div>
+    );
+}
+
+export function HBaseLayout({
+                                title = "Calibration Work",
+                                onExit,
+                                leftPanel,
+                                rightPanel,
+                            }: {
+    title?: string;
+    onExit: () => void;
+    leftPanel?: React.ReactNode;
+    rightPanel?: React.ReactNode;
+}) {
+    return (
+        <div className="hmi-base-layout" role="dialog" aria-label={title}>
+            <header className="hmi-base-layout__header">
+                <h1 className="hmi-base-layout__title">{title}</h1>
+                <button className="hmi-base-layout__exit" onClick={onExit}>Exit</button>
+            </header>
+            <main className="hmi-base-layout__content">
+                <section className="hmi-base-layout__panel" aria-label="Left panel">
+                    {leftPanel}
+                </section>
+                <section className="hmi-base-layout__panel" aria-label="Right panel">
+                    {rightPanel}
+                </section>
+            </main>
+        </div>
+    );
+}
+
+export function HCameraModal({onClose = () => {}}: { onClose?: () => void }) {
+    return <HBaseLayout onExit={onClose}/>;
+}
+
+function HLegacyCameraModal({
                                  onClose = () => {
                                  },
-                                 forcedKeyboardOpen = false
-                             }: { onClose?: () => void; forcedKeyboardOpen?: boolean }) {
+                                 forcedKeyboardOpen = false,
+                                 forcedKeyboardLayout = "ko"
+                             }: {
+    onClose?: () => void;
+    forcedKeyboardOpen?: boolean;
+    forcedKeyboardLayout?: "ko" | "en" | "symbol";
+}) {
     const guideColor = "rgba(0,202,228,0.42)";
     const guideSoft = "rgba(0,202,228,0.14)";
     const [keyboardOpen, setKeyboardOpen] = useState(forcedKeyboardOpen);
-    const [keyboardLayout, setKeyboardLayout] = useState<"ko" | "en" | "symbol">("ko");
+    const [keyboardLayout, setKeyboardLayout] = useState<"ko" | "en" | "symbol">(forcedKeyboardLayout);
     const keyboardRows = keyboardLayout === "ko"
         ? [
             ["ㅂ", "ㅈ", "ㄷ", "ㄱ", "ㅅ", "ㅛ", "ㅕ", "ㅑ", "ㅐ", "ㅔ"],
@@ -2698,6 +2798,7 @@ export function HMemoModal({onClose}: { onClose: () => void }) {
                     }}
                 />
                 <button
+                    className="hmi-modal__static-action-label"
                     onClick={() => {
                         if (draft.trim()) {
                             setMemos((p) => [
@@ -2883,6 +2984,7 @@ export function HCallModal({
                 })}
             </div>
             <button
+                className="hmi-modal__static-action-label"
                 onClick={() => {
                     if (!sel) return;
                     const p = HPRESETS.find((x) => x.id === sel)!;
@@ -3086,6 +3188,7 @@ export function HSaveModal({
                         </div>
                     </div>
                     <button
+                        className="hmi-modal__static-action-label"
                         onClick={() => {
                             if (name.trim()) setSaved(true);
                         }}
