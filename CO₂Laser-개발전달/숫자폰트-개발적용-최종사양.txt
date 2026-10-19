@@ -1,0 +1,168 @@
+# CO₂ Laser GUI 숫자 폰트 개발 적용 최종 사양
+
+버전: Final
+기준일: 2026-10-19
+기준 화면: 현재 프로젝트 07 Screens
+대상 해상도: 1024 × 768 px
+
+============================================================
+1. 폰트 적용 원칙
+============================================================
+
+숫자 값
+- Font: JetBrains Mono
+- Fallback: monospace
+- 사용 목적: 값 변경 시 글자 폭과 정렬 유지
+- 사용 굵기: 500, 700
+
+단위(W, sec, ms, mm 등)
+- Font: Inter
+- Fallback: Noto Sans KR, system-ui, sans-serif
+
+한글 UI
+- Font: Noto Sans KR
+
+영문 UI
+- Font: Inter
+
+CSS 기본 선언
+
+font-family: "JetBrains Mono", monospace;
+
+단위/UI 기본 선언
+
+font-family: Inter, "Noto Sans KR", system-ui, sans-serif;
+
+============================================================
+2. 메인 PARAMETERS 대형 숫자
+============================================================
+
+적용 위치
+- COS PARAMETERS 선택 값
+- FRX PARAMETERS 선택 값
+
+숫자 스타일
+
+font-family: "JetBrains Mono", monospace;
+font-size: 92px;
+font-weight: 500;
+line-height: 1;
+letter-spacing: -0.04em;
+transform-origin: center;
+color: rgb(216, 232, 255);
+
+단위 스타일
+
+font-family: Inter, "Noto Sans KR", system-ui, sans-serif;
+font-size: 28px;
+line-height: 1;
+color: rgb(78, 110, 154);
+
+배치
+- 숫자와 단위는 baseline 정렬
+- 숫자/단위 간격: 6px
+- 소수점은 앞뒤 간격을 줄여 표시
+
+============================================================
+3. SCAN MODE 및 FRX 크기 조절 숫자
+============================================================
+
+적용 위치
+- WIDTH
+- LENGTH
+- 기타 SCAN MODE 수치
+
+숫자 스타일
+
+font-family: "JetBrains Mono", monospace;
+font-size: 47px;
+font-weight: 500;
+line-height: 1;
+color: #FFFFFF;
+
+단위 스타일
+
+font-family: Inter, "Noto Sans KR", system-ui, sans-serif;
+font-size: 14px;
+line-height: 1;
+color: #FFFFFF;
+
+배치
+- 숫자와 단위는 baseline 정렬
+- 숫자/단위 간격: 2px
+- 값 표시 영역 최소 높이: 62px
+- 값 표시 영역 상하 패딩: 14px
+
+============================================================
+4. 파라미터 탭 상단 숫자
+============================================================
+
+적용 위치
+- COS 파라미터 탭
+- FRX 파라미터 탭
+
+숫자 스타일
+
+font-family: "JetBrains Mono", monospace;
+font-size: 28px;
+font-weight: 700;
+line-height: 1;
+letter-spacing: -0.04em;
+
+단위 스타일
+
+font-family: Inter, "Noto Sans KR", system-ui, sans-serif;
+font-size: 14px;
+font-weight: 600;
+line-height: 1;
+
+배치
+- 숫자와 단위는 baseline 정렬
+- 숫자/단위 간격: 3px
+- 숫자 영역과 파라미터명 간격: 5px
+- 파라미터명은 UI 폰트 사용
+
+상태별 색상
+- COS 선택: #00CAE4
+- FRX 선택: #1E7EF5
+- 비활성/미선택: 화면의 secondary/dim 토큰 사용
+
+============================================================
+5. 동적 텍스트 구현 원칙
+============================================================
+
+- 숫자와 단위는 서로 다른 텍스트 객체로 구현합니다.
+- 숫자에만 JetBrains Mono를 적용합니다.
+- 단위에는 Inter 또는 Noto Sans KR fallback을 적용합니다.
+- 숫자 값 변경 시 중앙 정렬과 baseline이 이동하지 않아야 합니다.
+- 소수점, 음수 기호, 숫자 자릿수 변경을 포함해 배치를 검증합니다.
+- 값이 비활성 상태일 때에도 같은 폰트 크기와 정렬을 유지하고 색상만 변경합니다.
+
+============================================================
+6. PNG / BMP 배경과 값 오버레이
+============================================================
+
+- 07 PNG / BMP는 1024 × 768 px 배경 이미지입니다.
+- EMVD에서 동적으로 표시할 파라미터 숫자와 단위는
+  배경 PNG / BMP에 포함되지 않습니다.
+- 개발 시 숫자와 단위를 별도 텍스트 레이어로 올려야 합니다.
+- 텍스트 레이어는 위 2~4번의 폰트 사양을 그대로 적용합니다.
+- PNG / BMP 배경 크기를 변경하거나 비율 조정하지 않습니다.
+
+============================================================
+7. 전달 파일
+============================================================
+
+폰트
+- JetBrainsMono-2.304.zip
+- Noto_Sans_KR.zip
+
+폰트/스타일 문서
+- 폰트-라이선스및 스타일 정보.txt
+- 숫자폰트-개발적용-최종사양.txt
+
+이미지
+- exports/png: 07 Screens PNG 83개
+- exports/bmp: 07 Screens 24-bit BMP 83개
+
+
